@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:aurora_fit/pages/aurora_first_page.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:aurora_fit/pages/aurora_ref.dart';
 
 void main() {
   runApp(const MyApp());
@@ -72,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    
+
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //

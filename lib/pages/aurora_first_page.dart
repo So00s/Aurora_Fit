@@ -1,9 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:aurora_fit/classes/button.dart';
+import 'aurora_ref.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AuroraFirstPage extends StatelessWidget {
+  
   const AuroraFirstPage({super.key});
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,9 +17,10 @@ class AuroraFirstPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            const SizedBox(height: 50,),
             // AURORA FIT на одной строке
             RichText(
-              text: TextSpan(
+              text: const TextSpan(
                 children: [
                   TextSpan(
                     text: 'AURORA ',
@@ -39,13 +44,13 @@ class AuroraFirstPage extends StatelessWidget {
               ),
             ),
             // Логотип на следующей строке
-            Icon(
-              Icons.signal_cellular_alt_rounded,
-              color: Colors.deepOrange,
-              size: 50,
+            Image.asset(
+              'assets/images/full.png', // Путь к вашему изображению
+              width: 100, // Ширина изображения
+              height: 100, // Высота изображения
             ),
             // Линия и текст
-            Column(
+            const Column(
               children: [
                 Divider(thickness: 1, color: Colors.black26, indent: 50, endIndent: 50),
                 Text(
@@ -60,7 +65,7 @@ class AuroraFirstPage extends StatelessWidget {
               ],
             ),
             // Звёзды прогресса
-            Column(
+            const Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -87,11 +92,18 @@ class AuroraFirstPage extends StatelessWidget {
             GradientButton(
               text: 'Продолжить',
               onPressed: () {
-                print('Кнопка нажата!');
+                // Переход на AuroraRefPage
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AuroraRefPage()),
+                );
               },
             ),
+            const SizedBox(height: 50,),
           ],
+          
         ),
+        
       ),
     );
   }
