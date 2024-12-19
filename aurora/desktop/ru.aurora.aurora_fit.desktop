@@ -7,6 +7,6 @@ Exec=/usr/bin/ru.aurora.aurora_fit
 X-Nemo-Application-Type=silica-qt5
 
 [X-Application]
-Permissions=
+Permissions=UserDirs
 OrganizationName=ru.aurora
 ApplicationName=aurora_fit
