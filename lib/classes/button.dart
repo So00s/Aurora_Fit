@@ -4,25 +4,25 @@ class GradientButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
 
-  GradientButton({required this.text, required this.onPressed});
+  const GradientButton({super.key, required this.text, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onPressed,
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 50),
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 50),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.deepOrange, Colors.purple],
+          gradient: const LinearGradient(
+            colors: [Color.fromARGB(255, 239, 85, 8),Color.fromARGB(255, 100, 4, 185),],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(15),
         ),
         child: Text(
           text,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.bold,

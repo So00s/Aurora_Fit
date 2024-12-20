@@ -3,7 +3,7 @@
 
 Name: ru.aurora.aurora_fit
 Summary: A new Flutter project.
-Version: 0.1.0
+Version: 0.1.1
 Release: 1
 License: Proprietary
 Source0: %{name}-%{version}.tar.zst

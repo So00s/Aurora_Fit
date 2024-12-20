@@ -1,8 +1,10 @@
+import 'package:aurora_fit/pages/shcedule_of_training.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:aurora_fit/classes/button.dart';
 import 'aurora_ref.dart';
 import 'package:image_picker/image_picker.dart';
+
 
 class AuroraFirstPage extends StatelessWidget {
   
@@ -27,7 +29,7 @@ class AuroraFirstPage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 35,
                       fontWeight: FontWeight.bold,
-                      color: Colors.deepOrangeAccent,
+                      color: Color.fromARGB(255, 239, 85, 8),
                       letterSpacing: 2,
                     ),
                   ),
@@ -36,7 +38,7 @@ class AuroraFirstPage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 35,
                       fontWeight: FontWeight.bold,
-                      color: Colors.purple,
+                      color: Color.fromARGB(255, 100, 4, 185),
                       letterSpacing: 2,
                     ),
                   ),
@@ -58,7 +60,7 @@ class AuroraFirstPage extends StatelessWidget {
                   style: TextStyle(
                     fontStyle: FontStyle.italic,
                     fontSize: 18,
-                    color: Colors.deepOrange,
+                    color: Color.fromARGB(255, 239, 85, 8),
                   ),
                 ),
                 Divider(thickness: 1, color: Colors.black26, indent: 50, endIndent: 50),
@@ -95,7 +97,7 @@ class AuroraFirstPage extends StatelessWidget {
                 // Переход на AuroraRefPage
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AuroraRefPage()),
+                  MaterialPageRoute(builder: (context) => const ScheduleScreen()),
                 );
               },
             ),

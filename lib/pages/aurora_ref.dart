@@ -41,7 +41,7 @@ class _AuroraRefPageState extends State<AuroraRefPage> {
 
   Future<Directory> _getStorageDirectory() async {
     try {
-      Directory dir = await getApplicationDocumentsDirectory();
+      Directory dir = await getApplicationSupportDirectory();
       return dir;
     } catch (e) {
       print('Ошибка при определении директории: $e');

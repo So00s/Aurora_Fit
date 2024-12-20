@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 239, 85, 8)),
         useMaterial3: true,
       ),
       home: const AuroraFirstPage(),
