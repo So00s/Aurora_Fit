@@ -44,7 +44,7 @@ class ScheduleScreen extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255,239, 85, 8),
+                              color: Color.fromARGB(255, 239, 85, 8),
                             ),
                           ),
                           const SizedBox(width: 4),
@@ -53,13 +53,12 @@ class ScheduleScreen extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255,100, 4, 185),
+                              color: Color.fromARGB(255, 100, 4, 185),
                             ),
                           ),
                           const SizedBox(width: 4),
                           Image.asset(
-                            'assets/images/for_1.png', // Путь к вашему изображению
-                            width: 30,
+                            'assets/images/full.png',
                             height: 30,
                           ),
                         ],
