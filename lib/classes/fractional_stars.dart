@@ -1,5 +1,3 @@
-// lib/classes/fractional_stars.dart
-
 import 'package:flutter/material.dart';
 
 class FractionalStars extends StatelessWidget {
@@ -20,38 +18,36 @@ class FractionalStars extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int fullStars = rating.floor();
-    bool hasHalfStar = (rating - fullStars) >= 0.5;
-
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: List.generate(starCount, (index) {
-        if (index < fullStars) {
-          return Icon(Icons.star, color: filledColor, size: size);
-        } else if (index == fullStars && hasHalfStar) {
-          return Stack(
-            children: [
-              Icon(Icons.star_border, color: unfilledColor, size: size),
-              ClipRect(
-                clipper: _HalfClipper(),
-                child: Icon(Icons.star, color: filledColor, size: size),
-              ),
-            ],
-          );
-        } else {
-          return Icon(Icons.star_border, color: unfilledColor, size: size);
-        }
+        double starFill = (rating - index).clamp(0, 1);
+        return Stack(
+          children: [
+            Icon(Icons.star_border, color: unfilledColor, size: size),
+            ClipRect(
+              clipper: _PartialStarClipper(fillPercentage: starFill),
+              child: Icon(Icons.star, color: filledColor, size: size),
+            ),
+          ],
+        );
       }),
     );
   }
 }
 
-class _HalfClipper extends CustomClipper<Rect> {
+class _PartialStarClipper extends CustomClipper<Rect> {
+  final double fillPercentage; // Значение от 0 до 1
+
+  _PartialStarClipper({required this.fillPercentage});
+
   @override
   Rect getClip(Size size) {
-    return Rect.fromLTWH(0.0, 0.0, size.width / 2, size.height);
+    return Rect.fromLTWH(0.0, 0.0, size.width * fillPercentage, size.height);
   }
 
   @override
-  bool shouldReclip(CustomClipper<Rect> oldClipper) => false;
+  bool shouldReclip(covariant CustomClipper<Rect> oldClipper) {
+    return true;
+  }
 }

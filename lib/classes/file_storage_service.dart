@@ -27,8 +27,8 @@ class FileStorageService {
   /// Получение директории для хранения данных
   Future<Directory> _getStorageDirectory() async {
     try {
-      Directory dir = await getApplicationDocumentsDirectory();
-      Directory appDir = Directory('${dir.path}/SimpleNotebook');
+      Directory dir = await getApplicationSupportDirectory();
+      Directory appDir = Directory('${dir.path}/AuroraFit');
       if (!await appDir.exists()) {
         await appDir.create(recursive: true);
       }
