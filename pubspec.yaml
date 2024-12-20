@@ -39,7 +39,6 @@ dependencies:
       ref: aurora-path_provider_aurora-0.6.1
 
 
-
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
@@ -71,6 +70,7 @@ flutter:
   assets:
     - assets/images/full.png
     - assets/images/
+    - lib/json/types_of_trainings.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
