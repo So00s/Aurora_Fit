@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:aurora_fit/pages/schedule_screen.dart';
+import 'package:aurora_fit/pages/aurora_training_types_page.dart';
 import 'package:aurora_fit/classes/gradient_button.dart';
 import 'package:aurora_fit/classes/fractional_stars.dart';
 
@@ -92,7 +93,7 @@ class _AuroraFirstPageState extends State<AuroraFirstPage> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Ваш прогресс за неделю\n(${_progress.toString()} из 5 звёзд)',
+                    'Ваш прогресс за неделю\n(${_progress.toStringAsPrecision(2)} из 5 звёзд)',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 16,

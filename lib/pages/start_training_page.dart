@@ -118,7 +118,7 @@ class _StartTrainingPageState extends State<StartTrainingPage> {
     setState(() {
       _currentExerciseIndex++;
     });
-    if (_currentExerciseIndex < widget.training.exercises.length) {
+    if (_currentExerciseIndex < widget.training.exercises.length - 1) {
       _startExercise(widget.training.exercises[_currentExerciseIndex]);
     } else {
       _showCompletionDialog();
