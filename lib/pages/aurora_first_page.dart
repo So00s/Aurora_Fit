@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:aurora_fit/pages/schedule_screen.dart';
 import 'package:aurora_fit/classes/gradient_button.dart';
 import 'package:aurora_fit/classes/fractional_stars.dart';
+import 'package:aurora_fit/pages/training_description_screen.dart';
+
 
 class AuroraFirstPage extends StatefulWidget {
   const AuroraFirstPage({Key? key}) : super(key: key);
@@ -108,7 +110,7 @@ class _AuroraFirstPageState extends State<AuroraFirstPage> {
                   // Переход на ScheduleScreen
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ScheduleScreen()),
+                    MaterialPageRoute(builder: (context) => const DescriptionOfTraining(trainingType: "cardio", trainingName: "first",)),
                   );
                 },
               ),
