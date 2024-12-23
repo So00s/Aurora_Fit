@@ -7,11 +7,11 @@ import 'package:aurora_fit/models/training.dart';
 import 'package:aurora_fit/models/fitness_data.dart';
 
 
-class DescriptionOfTraining extends StatefulWidget {
+class TrainingDescriptionScreen extends StatefulWidget {
   final String trainingType; // Тип тренировки (например, "cardio")
   final String trainingName; // Название конкретной тренировки из файла .json (например, "first")
 
-  const DescriptionOfTraining({
+  const TrainingDescriptionScreen({
     Key? key,
     required this.trainingType,
     required this.trainingName,
@@ -21,7 +21,7 @@ class DescriptionOfTraining extends StatefulWidget {
   _DescriptionOfTrainingState createState() => _DescriptionOfTrainingState();
 }
 
-class _DescriptionOfTrainingState extends State<DescriptionOfTraining> {
+class _DescriptionOfTrainingState extends State<TrainingDescriptionScreen> {
   List<dynamic> exercises = [];
   late Future<FitnessData> _fitnessDataFuture;
   FitnessData? _fitnessData;
