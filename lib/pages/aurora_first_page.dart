@@ -110,7 +110,7 @@ class _AuroraFirstPageState extends State<AuroraFirstPage> {
                   // Переход на ScheduleScreen
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const DescriptionOfTraining(trainingType: "cardio", trainingName: "first",)),
+                    MaterialPageRoute(builder: (context) => const ScheduleScreen()),
                   );
                 },
               ),

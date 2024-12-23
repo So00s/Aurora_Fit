@@ -1,13 +1,10 @@
-// lib/pages/schedule_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:aurora_fit/services/fitness_data_service.dart';
 import 'package:aurora_fit/pages/training_selection_page.dart';
-import 'package:aurora_fit/models/exercise.dart' as ex; // Псевдоним для Exercise
 import 'package:aurora_fit/models/fitness_data.dart';
-import 'package:aurora_fit/models/training.dart'; 
-import 'package:aurora_fit/classes/gradient_button.dart'; 
-import 'package:aurora_fit/pages/start_training_page.dart';
+import 'package:aurora_fit/models/training.dart';
+import 'package:collection/collection.dart';
+
 
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({Key? key}) : super(key: key);
@@ -27,24 +24,36 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     _fitnessDataFuture = _fitnessDataService.loadFitnessData();
   }
 
-  void _addTraining(String categoryKey, String trainingKey, Training training) {
+  void _addTimeToDay(String day, String time) {
     setState(() {
-      _fitnessData?.categories[categoryKey]?.trainings[trainingKey]?.exercises
-          .addAll(training.exercises);
+      _fitnessData?.schedule[day]?.add(TrainingSlot(time: time));
     });
     _saveData();
   }
 
-  void _toggleExerciseCompletion(
-      String categoryKey, String trainingKey, int exerciseIndex) {
+  void _navigateToTrainingSelection(String day, String time) async {
+  final selectedTraining = await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => TrainingSelectionPage(
+        selectedTime: time,
+        categoryKey: day,
+      ),
+    ),
+  );
+
+  if (selectedTraining != null && selectedTraining is Training) {
     setState(() {
-      ex.Exercise exercise =
-          _fitnessData!.categories[categoryKey]!.trainings[trainingKey]!
-              .exercises[exerciseIndex];
-      exercise.isCompleted = !exercise.isCompleted;
+      var slot = _fitnessData?.schedule[day]?.firstWhereOrNull(
+        (slot) => slot.time == time,
+      );
+      if (slot != null) {
+        slot.training = selectedTraining;
+      }
     });
     _saveData();
   }
+}
 
   Future<void> _saveData() async {
     if (_fitnessData != null) {
@@ -56,72 +65,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 248, 248, 248),
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(120), // Увеличиваем высоту AppBar
-        child: AppBar(
-          backgroundColor: const Color.fromARGB(255, 248, 248, 248),
-          automaticallyImplyLeading: false, // Убираем стандартный отступ для стрелки
-          elevation: 0,
-          flexibleSpace: Padding(
-            padding: const EdgeInsets.only(top: 0.0), // Отступ сверху
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back,
-                      color: Color.fromARGB(255, 239, 85, 8)),
-                  onPressed: () {
-                    Navigator.pop(context); // Возврат на предыдущий экран
-                  },
-                ),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            'AURORA',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255, 239, 85, 8),
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          const Text(
-                            'FIT',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255, 100, 4, 185),
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Image.asset(
-                            'assets/images/full.png',
-                            height: 30,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Расписание тренировок',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 100, 4, 185),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+      appBar: AppBar(
+        title: const Text('Расписание тренировок'),
+        backgroundColor: const Color.fromARGB(255, 239, 85, 8),
       ),
       body: FutureBuilder<FitnessData>(
         future: _fitnessDataFuture,
@@ -132,47 +78,22 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             return Center(child: Text('Ошибка: ${snapshot.error}'));
           } else if (snapshot.hasData) {
             _fitnessData = snapshot.data;
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0), // Общий отступ для экрана
-                child: Column(
-                  children: _fitnessData!.categories.entries.map((categoryEntry) {
-                    String categoryKey = categoryEntry.key;
-                    var category = categoryEntry.value;
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          category.title,
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        ...category.trainings.entries.map((trainingEntry) {
-                          String trainingKey = trainingEntry.key;
-                          Training training = trainingEntry.value;
-                          return DaySchedule(
-                            categoryKey: categoryKey,
-                            trainingKey: trainingKey,
-                            training: training,
-                            color: _getDayColor(categoryKey, trainingKey),
-                            onAdd: (newTraining) {
-                              _addTraining(categoryKey, trainingKey, newTraining);
-                            },
-                            onToggleComplete: (exerciseIndex) {
-                              _toggleExerciseCompletion(
-                                  categoryKey, trainingKey, exerciseIndex);
-                            },
-                          );
-                        }).toList(),
-                        const SizedBox(height: 20),
-                      ],
-                    );
-                  }).toList(),
-                ),
-              ),
+            return ListView(
+              padding: const EdgeInsets.all(16.0),
+              children: _fitnessData!.schedule.entries.map((entry) {
+                String day = entry.key; // День недели
+                List<TrainingSlot> slots = entry.value; // Тренировки в этот день
+                return DaySchedule(
+                  day: day,
+                  slots: slots,
+                  onAddTime: (time) {
+                    _addTimeToDay(day, time);
+                  },
+                  onSelectSlot: (slot) {
+                    _navigateToTrainingSelection(day, slot.time);
+                  },
+                );
+              }).toList(),
             );
           } else {
             return const Center(child: Text('Нет данных'));
@@ -181,203 +102,81 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       ),
     );
   }
-
-  Color _getDayColor(String categoryKey, String trainingKey) {
-    // Определение цвета на основе категории и тренировки
-    if (categoryKey == 'cardio') {
-      if (trainingKey == 'first') {
-        return const Color.fromARGB(255, 255, 214, 199);
-      } else if (trainingKey == 'second') {
-        return const Color.fromARGB(155, 239, 85, 8);
-      }
-      // Добавьте другие условия по необходимости
-    } else if (categoryKey == 'power') {
-      if (trainingKey == 'first') {
-        return const Color.fromARGB(112, 236, 198, 225);
-      }
-      // Добавьте другие условия по необходимости
-    }
-    return Colors.grey;
-  }
 }
 
 class DaySchedule extends StatelessWidget {
-  final String categoryKey;
-  final String trainingKey;
-  final Training training;
-  final Color color;
-  final Function(Training) onAdd;
-  final Function(int) onToggleComplete;
+  final String day;
+  final List<TrainingSlot> slots;
+  final Function(String) onAddTime; // Добавить время
+  final Function(TrainingSlot) onSelectSlot; // Выбрать слот
 
   const DaySchedule({
     Key? key,
-    required this.categoryKey,
-    required this.trainingKey,
-    required this.training,
-    required this.color,
-    required this.onAdd,
-    required this.onToggleComplete,
+    required this.day,
+    required this.slots,
+    required this.onAddTime,
+    required this.onSelectSlot,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Card(
       margin: const EdgeInsets.only(bottom: 16.0),
-      padding: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(14.0),
-      ),
-      child: Column(
-        children: [
-          // Заголовок тренировки и галочка выполнения
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                training.name,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              day,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
-              // Галочка для выполнения тренировки
-              Checkbox(
-                value: _isTrainingCompleted(),
-                onChanged: (value) {
-                  // Логика для отметки всей тренировки как выполненной
-                  // Может быть реализована через callback
-                },
-              ),
-            ],
-          ),
-          // Список упражнений
-          Column(
-            children: training.exercises.asMap().entries.map((entry) {
-              int index = entry.key;
-              ex.Exercise exercise = entry.value; // Используем алиас
+            ),
+            const SizedBox(height: 8),
+            ...slots.map((slot) {
               return ListTile(
-                leading: const Icon(Icons.access_time),
-                title: Text(
-                  exercise.time,
-                  style: const TextStyle(fontSize: 16),
-                ),
-                subtitle: Text(exercise.description),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('${exercise.calories} ккал'),
-                    const SizedBox(width: 10),
-                    Checkbox(
-                      value: exercise.isCompleted,
-                      onChanged: (value) {
-                        onToggleComplete(index);
-                      },
-                    ),
-                  ],
+                title: Text(slot.time),
+                subtitle: slot.training != null
+                    ? Text(slot.training!.name)
+                    : const Text('Тренировка не выбрана'),
+                trailing: IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () => onSelectSlot(slot),
                 ),
               );
             }).toList(),
-          ),
-          // Кнопка "Добавить"
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
+            TextButton.icon(
               onPressed: () {
                 _showTimePicker(context);
               },
               icon: const Icon(Icons.add),
-              label: const Text('Добавить'),
+              label: const Text('Добавить время'),
             ),
-          ),
-          // Кнопка "Начать тренировку"
-          Align(
-            alignment: Alignment.centerRight,
-            child: GradientButton(
-              text: 'Начать тренировку',
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => StartTrainingPage(training: training),
-                  ),
-                ).then((value) {
-                  if (value != null && value == true) {
-                    // Обновить состояние тренировки как выполненной
-                    // Реализуйте соответствующую логику
-                  }
-                });
-              },
-            ),
-          ),
-          const Divider(color: Colors.black),
-        ],
-      ),
-    );
-  }
-
-  bool _isTrainingCompleted() {
-    return training.exercises.every((exercise) => exercise.isCompleted);
-  }
-
-  void _showTimePicker(BuildContext context) {
-    // Оставляем метод без изменений или реализуем добавление новой тренировки
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true, // Для полной высоты
-      builder: (BuildContext context) {
-        return FractionallySizedBox(
-          heightFactor: 0.2, // 1/5 экрана
-          child: ListView(
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text(
-                  'Выберите время',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(height: 20),
-              ...List.generate(24, (hour) {
-                String formattedHour = hour.toString().padLeft(2, '0');
-                return ListTile(
-                  title: Text(
-                    '$formattedHour:00',
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _navigateToTrainingSelection(context, '$formattedHour:00');
-                  },
-                );
-              }),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _navigateToTrainingSelection(BuildContext context, String time) async {
-    final selectedTraining = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TrainingSelectionPage(
-          selectedTime: time,
-          categoryKey: categoryKey,
-          sessionKey: trainingKey,
+          ],
         ),
       ),
     );
+  }
 
-    if (selectedTraining != null && selectedTraining is Training) {
-      onAdd(selectedTraining);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content:
-                Text('Тренировка "${selectedTraining.name}" добавлена в $time')),
-      );
-    }
+  void _showTimePicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return ListView(
+          children: List.generate(24, (hour) {
+            String time = '${hour.toString().padLeft(2, '0')}:00';
+            return ListTile(
+              title: Text(time),
+              onTap: () {
+                Navigator.pop(context);
+                onAddTime(time);
+              },
+            );
+          }),
+        );
+      },
+    );
   }
 }
