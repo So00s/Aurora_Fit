@@ -2,8 +2,8 @@
 %global __requires_exclude ^lib(dconf|flutter-embedder|maliit-glib|.+_platform_plugin)\\.so.*$
 
 Name: ru.aurora.aurora_fit
-Summary: A new Flutter project.
-Version: 0.1.1
+Summary: Aurora Fit - текст.
+Version: 0.1.2.17
 Release: 1
 License: Proprietary
 Source0: %{name}-%{version}.tar.zst

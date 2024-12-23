@@ -1,3 +1,5 @@
+// lib/classes/file_storage_service.dart
+
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -25,8 +27,8 @@ class FileStorageService {
   /// Получение директории для хранения данных
   Future<Directory> _getStorageDirectory() async {
     try {
-      Directory dir = await getApplicationDocumentsDirectory();
-      Directory appDir = Directory('${dir.path}/SimpleNotebook');
+      Directory dir = await getApplicationSupportDirectory();
+      Directory appDir = Directory('${dir.path}/AuroraFit');
       if (!await appDir.exists()) {
         await appDir.create(recursive: true);
       }

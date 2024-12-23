@@ -1,7 +1,9 @@
+// lib/pages/aurora_ref.dart
+
 import 'package:aurora_fit/pages/aurora_first_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:aurora_fit/classes/button.dart';
+import 'package:aurora_fit/classes/gradient_button.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
