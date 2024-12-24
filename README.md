@@ -10,19 +10,12 @@
 
 <div style="background-color: #f0f0f0; padding: 10px; border-radius: 5px;">
 <p>FractionalStars</p>
-
 <p>(</p>
-
   <p>rating: 3.7, // Обязательный параметр: Рейтинг от 0 до 5.</p>
-  
   <p>starCount: 5, // Необязательный: Количество звезд (по умолчанию 5).</p>
-  
   <p>size: 30,      // Необязательный: Размер звезд (по умолчанию 40).</p>
-  
   <p>filledColor: Colors.yellow, // Необязательный: Цвет заполненной части звезд (по умолчанию Colors.orange).</p>
-  
   <p>unfilledColor: Colors.grey, // Необязательный: Цвет незаполненной части звезд (по умолчанию Colors.grey).</p>
-  
 <p>)</p>
 </div>
 
