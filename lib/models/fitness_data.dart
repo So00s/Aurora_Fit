@@ -3,48 +3,50 @@
 import 'training.dart';
 
 class FitnessData {
-  final Map<String, ExerciseCategory> categories;
+  final Map<String, List<TrainingSlot>> schedule; // Дни недели и тренировки
 
-  FitnessData({required this.categories});
+  FitnessData({required this.schedule});
 
   factory FitnessData.fromJson(Map<String, dynamic> json) {
-    Map<String, ExerciseCategory> categories = {};
+    Map<String, List<TrainingSlot>> schedule = {};
     json.forEach((key, value) {
-      categories[key] = ExerciseCategory.fromJson(value);
+      schedule[key] = (value as List).map((e) => TrainingSlot.fromJson(e)).toList();
     });
-    return FitnessData(categories: categories);
+    return FitnessData(schedule: schedule);
   }
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
-    categories.forEach((key, value) {
-      json[key] = value.toJson();
+    schedule.forEach((key, value) {
+      json[key] = value.map((e) => e.toJson()).toList();
     });
     return json;
   }
 }
 
-class ExerciseCategory {
-  final String title;
-  final Map<String, Training> trainings;
+class TrainingSlot {
+  final String time;
+  Training? _training; // Приватное поле для тренировки
 
-  ExerciseCategory({required this.title, required this.trainings});
+  TrainingSlot({required this.time, Training? training}) : _training = training;
 
-  factory ExerciseCategory.fromJson(Map<String, dynamic> json) {
-    Map<String, Training> trainings = {};
-    json.forEach((key, value) {
-      if (key != 'title') {
-        trainings[key] = Training.fromJson(value);
-      }
-    });
-    return ExerciseCategory(title: json['title'], trainings: trainings);
+  // Геттер для тренировки
+  Training? get training => _training;
+
+  // Сеттер для тренировки
+  set training(Training? value) {
+    _training = value;
   }
 
-  Map<String, dynamic> toJson() {
-    Map<String, dynamic> json = {'title': title};
-    trainings.forEach((key, value) {
-      json[key] = value.toJson();
-    });
-    return json;
+  factory TrainingSlot.fromJson(Map<String, dynamic> json) {
+    return TrainingSlot(
+      time: json['time'],
+      training: json['training'] != null ? Training.fromJson(json['training']) : null,
+    );
   }
+
+  Map<String, dynamic> toJson() => {
+        'time': time,
+        'training': training?.toJson(),
+      };
 }
