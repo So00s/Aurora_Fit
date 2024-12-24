@@ -1,21 +1,18 @@
-// lib/pages/training_selection_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:aurora_fit/models/training.dart';
 import 'package:aurora_fit/models/fitness_data.dart';
 import 'package:aurora_fit/services/fitness_data_service.dart';
 import 'package:aurora_fit/models/exercise.dart' as ex; // Псевдоним для Exercise
+import 'package:collection/collection.dart';
 
 class TrainingSelectionPage extends StatefulWidget {
-  final String selectedTime;
-  final String categoryKey;
-  final String sessionKey;
+  final String selectedTime; // Время слота
+  final String categoryKey; // День недели
 
   const TrainingSelectionPage({
     Key? key,
     required this.selectedTime,
     required this.categoryKey,
-    required this.sessionKey,
   }) : super(key: key);
 
   @override
@@ -48,10 +45,14 @@ class _TrainingSelectionPageState extends State<TrainingSelectionPage> {
             return Center(child: Text('Ошибка: ${snapshot.error}'));
           } else if (snapshot.hasData) {
             _fitnessData = snapshot.data;
+
+            // Получаем тренировку для выбранного времени
             Training? trainingToAdd = _getTrainingToAdd();
             if (trainingToAdd == null) {
               return const Center(child: Text('Нет доступных тренировок'));
             }
+
+            // Отображаем упражнения в виде сетки
             return GridView.builder(
               padding: const EdgeInsets.all(16.0),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -96,13 +97,18 @@ class _TrainingSelectionPageState extends State<TrainingSelectionPage> {
     );
   }
 
+  // Метод для получения тренировки из расписания
   Training? _getTrainingToAdd() {
-    // Получаем тренировку из выбранной категории и сессии
     if (_fitnessData == null) return null;
-    var category = _fitnessData!.categories[widget.categoryKey];
-    if (category == null) return null;
-    var training = category.trainings[widget.sessionKey];
-    return training;
+
+    var daySlots = _fitnessData!.schedule[widget.categoryKey];
+    if (daySlots == null) return null;
+
+    var slot = daySlots.firstWhereOrNull(
+      (slot) => slot.time == widget.selectedTime,
+    );
+
+    return slot?.training;
   }
 
   void _selectExercise(ex.Exercise exercise) {
