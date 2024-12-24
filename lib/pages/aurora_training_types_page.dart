@@ -8,19 +8,65 @@ import 'package:aurora_fit/classes/gradient_button.dart';
 import 'package:aurora_fit/pages/start_training_page.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-class AuroraTrainigTypesPage extends StatefulWidget {
-  const AuroraTrainigTypesPage({Key? key}) : super(key: key);
+class AuroraTrainingTypesPage extends StatefulWidget {
+  const AuroraTrainingTypesPage({Key? key}) : super(key: key);
   @override 
-   _AuroraTrainigTypesPageState createState() => _AuroraTrainigTypesPageState();
+   _AuroraTrainingTypesPageState createState() => _AuroraTrainingTypesPageState();
 }
 
 class FitnessButton extends StatelessWidget{
   final String text;
-  
+  final Color color1, color2;
+  final Image icon;
+  final VoidCallback onPressed;
 
+  const FitnessButton({
+    Key? key,
+    required this.text,
+    required this.color1,
+    required this.color2,
+    required this.icon,
+    required this.onPressed,
+  }) :super (key: key);
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 160, // Фиксированная ширина
+      height: 160, // Фиксированная высота
+      child: InkWell(
+        onTap: onPressed,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [color1, color2],
+              begin: Alignment.bottomLeft,
+              end: Alignment.topRight,
+            ),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          alignment: Alignment.center,
+          child: Column(
+            children: [ 
+              Text(
+                text,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16, // Уменьшенный размер для среднего текста
+                fontWeight: FontWeight.w500, // Средний вес текста
+              ),
+              textAlign: TextAlign.center,
+            ),
+            icon,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-class _AuroraTrainigTypesPageState extends State<AuroraTrainigTypesPage>{
+
+class _AuroraTrainingTypesPageState extends State<AuroraTrainingTypesPage>{
   late Future<FitnessData> _fitnessDataFuture;
   FitnessData? _fitnessData;
   final FitnessDataService _fitnessDataService = FitnessDataService();
@@ -101,8 +147,15 @@ class _AuroraTrainigTypesPageState extends State<AuroraTrainigTypesPage>{
       ),
       body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: 
-            
+          child: FitnessButton(text: "Тип тренировки",
+          color1: Color.fromRGBO(134, 4, 255, 0.17),
+          color2:  Color.fromRGBO(195, 0, 255, 0.53),
+          icon: Image.asset(
+                'assets/images/full.png', // Путь к вашему изображению
+                width: 89, // Ширина изображения
+                height: 70, // Высота изображения
+              ),
+          onPressed: (){} ,)
         )
     );
   }
