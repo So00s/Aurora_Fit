@@ -1,3 +1,5 @@
+//lib/pages/choosing_of_training_screen.dart
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
