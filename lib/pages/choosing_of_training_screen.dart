@@ -141,7 +141,7 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => TrainingDescriptionScreen(
+                        builder: (context) => DescriptionOfTraining(
                           trainingType: widget.trainingType, // Передаём тип тренировки
                           trainingName: trainingKey, // Передаём ключ тренировки
                         ),

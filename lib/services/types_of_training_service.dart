@@ -7,7 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import '../models/types_of_trainings.dart';
 
 class TypesOfDataService {
-  final String _fileName = 'types_of_training.json';
+  final String _fileName = 'json/types_of_training.json';
 
   Future<TypesOfTrainings> loadFitnessData() async {
     try {

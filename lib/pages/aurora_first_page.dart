@@ -112,7 +112,7 @@ class _AuroraFirstPageState extends State<AuroraFirstPage> {
                   // Переход на ScheduleScreen
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const AuroraTrainingTypesPage()),
+                    MaterialPageRoute(builder: (context) => const ChoosingOfTrainingScreen(trainingType: "cardio",)),
                   );
                 },
               ),
