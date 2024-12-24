@@ -26,6 +26,11 @@
 - Прогресс выполнения тренировок в виде пяти звёзд, заполняющихся по мере выполнения;
 - Кнопки: `Продолжить` и `Увеличить прогресс`.
 
+> [!CAUTION]
+> #### Приложение работает только на Аврора ОС
+
+
+
 ---
 
 ## Начало работы
@@ -89,32 +94,8 @@
 ---
 
 ## Галерея
+![1](images/scr1.jpg)
+![2](images/scr2.jpg)
+![3](images/scr3.jpg)
+![4](images/scr4.jpg)
 
-```html
-<div class="gallery">
-  <div class="photo">
-    <img src="path_to_image1.jpg" alt="Описание фото 1">
-  </div>
-  <div class="photo">
-    <img src="path_to_image2.jpg" alt="Описание фото 2">
-  </div>
-  <!-- Добавьте больше блоков, если нужно -->
-</div>
-
-<style>
-  .gallery {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 16px;
-  }
-  .photo {
-    width: 150px;
-    height: 300px;
-    overflow: hidden;
-  }
-  .photo img {
-    width: 100%;
-    height: auto;
-  }
-</style>
