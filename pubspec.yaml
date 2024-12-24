@@ -31,12 +31,18 @@ dependencies:
   flutter:
     sdk: flutter
   path_provider: ^2.1.5
-  flutter_local_notifications: ^18.0.1
+
   path_provider_aurora:
     git:
       url: https://gitlab.com/omprussia/flutter/packages.git
       path: packages/path_provider_aurora
       ref: aurora-path_provider_aurora-0.6.1
+
+  flutter_local_notifications: ^18.0.1
+  flutter_local_notifications_aurora:
+    git:
+      url: https://gitlab.com/omprussia/flutter/flutter-community-plugins/flutter_local_notifications_aurora.git
+      ref: aurora-0.5.3
   collection: ^1.16.0
 
   # The following adds the Cupertino Icons font to your application.

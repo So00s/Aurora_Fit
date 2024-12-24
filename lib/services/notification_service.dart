@@ -8,55 +8,33 @@ class NotificationService {
 
   // Инициализация уведомлений
   Future<void> initializeNotifications() async {
-    tzdata.initializeTimeZones();
-    var initializationSettings = InitializationSettings(
-      android: AndroidInitializationSettings('app_icon'),
-      // Добавьте настройки для других платформ, если нужно
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('app_icon'); // Укажите иконку уведомления
+    const InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
     );
+
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
-  // Планирование уведомлений (платформонезависимое решение)
-  Future<void> scheduleNotification(int hour, int minute) async {
-    final location = tz.getLocation('UTC'); // Используем UTC для платформонезависимости
-
-    // Создаем время уведомления
-    final notificationTime = tz.TZDateTime(
-      location,
-      DateTime.now().year,
-      DateTime.now().month,
-      DateTime.now().day,
-      hour,
-      minute,
-    );
-
-    // Если время уведомления уже прошло, перенесем его на следующий день
-    if (notificationTime.isBefore(tz.TZDateTime.now(location))) {
-      notificationTime.add(Duration(days: 1));
-    }
-
-    // Настройки уведомления (общие для всех платформ)
-    var notificationDetails = NotificationDetails(
+  // Немедленное отображение уведомления
+  Future<void> showNotification() async {
+    const notificationDetails = NotificationDetails(
       android: AndroidNotificationDetails(
-        'your_channel_id',
-        'your_channel_name',
-        channelDescription: 'your_channel_description',
+        'general_notifications', // Уникальный ID канала
+        'General Notifications', // Имя канала
+        channelDescription: 'Notifications about general app updates and news',
         importance: Importance.max,
         priority: Priority.high,
       ),
-      // Добавьте настройки для других платформ, если нужно
     );
 
-    // Планируем уведомление (платформонезависимый код)
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-      0,
-      'Напоминание',
-      'Это уведомление будет отправлено в указанное время.',
-      notificationTime,
+    await flutterLocalNotificationsPlugin.show(
+      0, // ID уведомления
+      'Напоминание', // Заголовок уведомления
+      'Это уведомление появляется немедленно!', // Текст уведомления
       notificationDetails,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      androidScheduleMode: AndroidScheduleMode.exact,
     );
   }
 }
+

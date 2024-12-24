@@ -1,7 +1,7 @@
 import 'dart:io';
 
 void main() {
-  const specFilePath = '/home/loodsman/aurora_fit/aurora/rpm/ru.aurora.aurora_fit.spec'; // Укажите путь к вашему spec-файлу
+  const specFilePath = '/home/loodsman/test/Aurora_Fit/aurora/rpm/ru.aurora.aurora_fit.spec'; // Укажите путь к вашему spec-файлу
 
   final specFile = File(specFilePath);
 
