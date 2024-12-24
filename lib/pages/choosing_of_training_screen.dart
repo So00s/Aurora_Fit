@@ -7,7 +7,9 @@ import "package:aurora_fit/services/fitness_data_service.dart";
 import 'package:aurora_fit/models/exercise.dart' as ex;
 import 'package:aurora_fit/models/training.dart';
 import 'package:aurora_fit/models/fitness_data.dart';
+import 'package:aurora_fit/models/types_of_trainings.dart';
 import 'package:aurora_fit/pages/training_description_screen.dart';
+import 'package:aurora_fit/services/types_of_training_service.dart';
 
 class ChoosingOfTrainingScreen extends StatefulWidget {
   final String trainingType; // Тип тренировки (например, "cardio")
@@ -20,20 +22,20 @@ class ChoosingOfTrainingScreen extends StatefulWidget {
 }
 
 class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
-  late Future<FitnessData> _fitnessDataFuture;
-  FitnessData? _fitnessData;
+  late Future<TypesOfTrainings> _fitnessDataFuture;
+  TypesOfTrainings? _fitnessData;
 
   @override
   void initState() {
     super.initState();
-    _fitnessDataFuture = FitnessDataService().loadFitnessData();
+    _fitnessDataFuture = TypesOfDataService().loadFitnessData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 248, 248, 248),
-      body: FutureBuilder<FitnessData>(
+      body: FutureBuilder<TypesOfTrainings>(
         future: _fitnessDataFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
