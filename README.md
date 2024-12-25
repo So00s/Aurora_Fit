@@ -20,7 +20,7 @@
 
 ## Запуск
 
-Чтобы собрать приложение используйте `flutter-aurora build aurora --release`, \\
+Чтобы собрать приложение используйте `flutter-aurora build aurora --release`, //
 перед этим установив [Flutter SDK для Аврора ОС](https://gitlab.com/omprussia/flutter/flutter)
 
 > [!TIP]
