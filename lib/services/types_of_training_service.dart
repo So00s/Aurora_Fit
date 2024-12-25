@@ -7,7 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import '../models/types_of_trainings.dart';
 
 class TypesOfDataService {
-  final String _fileName = 'types_of_training.json';
+  final String _fileName = 'types_of_trainings.json';
 
   Future<TypesOfTrainings> loadFitnessData() async {
     try {
@@ -19,7 +19,7 @@ class TypesOfDataService {
       } else {
         // Если файл не существует, загрузите данные из assets
         String assetString =
-            await rootBundle.loadString('lib/json/types_of_training.json');
+            await rootBundle.loadString('lib/json/types_of_trainings.json');
         final jsonData = jsonDecode(assetString);
         TypesOfTrainings fitnessData = TypesOfTrainings.fromJson(jsonData);
         await saveFitnessData(fitnessData); // Сохраняем начальные данные

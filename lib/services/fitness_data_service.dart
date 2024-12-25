@@ -44,7 +44,7 @@ class FitnessDataService {
   }
 
   Future<File> _getLocalFile() async {
-    final directory = await getApplicationSupportDirectory();
+    final directory = await getApplicationDocumentsDirectory();
     return File('${directory.path}/$_fileName');
   }
 }

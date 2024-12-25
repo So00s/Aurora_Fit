@@ -98,7 +98,7 @@ class _TrainingSelectionPageState extends State<TrainingSelectionPage> {
   }
 
   // Метод для получения тренировки из расписания
-  Training? _getTrainingToAdd() {
+  Training?   _getTrainingToAdd() {
     if (_fitnessData == null) return null;
 
     var daySlots = _fitnessData!.schedule[widget.categoryKey];

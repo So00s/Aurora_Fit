@@ -22,13 +22,16 @@ class ChoosingOfTrainingScreen extends StatefulWidget {
 }
 
 class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
-  late Future<TypesOfTrainings> _fitnessDataFuture;
-  TypesOfTrainings? _fitnessData;
+  late Future<TypesOfTrainings> _trainingDataFuture;
+  TypesOfTrainings? _trainingData;
+  late Future<FitnessData> _fitnessDataFuture;
+  FitnessData? _fitnessData;
 
   @override
   void initState() {
     super.initState();
-    _fitnessDataFuture = TypesOfDataService().loadFitnessData();
+    _trainingDataFuture = TypesOfDataService().loadFitnessData();
+    _fitnessDataFuture = FitnessDataService().loadFitnessData();
   }
 
   @override
@@ -36,14 +39,14 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 248, 248, 248),
       body: FutureBuilder<TypesOfTrainings>(
-        future: _fitnessDataFuture,
+        future: _trainingDataFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Ошибка: ${snapshot.error}'));
           } else if (snapshot.hasData) {
-            _fitnessData = snapshot.data;
+            _trainingData = snapshot.data;
             var trainings = _getTrainings();
             String trainingTypeTitle = _getTrainingTypeTitle();
 
@@ -65,16 +68,16 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
 
   /// Извлечение списка тренировок
   Map<String, Training> _getTrainings() {
-    if (_fitnessData == null) return {};
-    var category = _fitnessData!.categories[widget.trainingType];
+    if (_trainingData == null) return {};
+    var category = _trainingData!.categories[widget.trainingType];
     if (category == null) return {};
     return category.trainings; // Возвращаем мапу тренировок с ключами
   }
 
   /// Получение названия типа тренировки
   String _getTrainingTypeTitle() {
-    if (_fitnessData == null) return 'Нет данных';
-    var category = _fitnessData!.categories[widget.trainingType];
+    if (_trainingData == null) return 'Нет данных';
+    var category = _trainingData!.categories[widget.trainingType];
     return category?.title ?? 'Неизвестный тип';
   }
 
@@ -141,7 +144,7 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => TrainingDescriptionScreen(
+                        builder: (context) => DescriptionOfTraining(
                           trainingType: widget.trainingType, // Передаём тип тренировки
                           trainingName: trainingKey, // Передаём ключ тренировки
                         ),
@@ -180,6 +183,45 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
     return training.exercises.fold(
         0, (sum, exercise) => sum + (exercise.calories ?? 0));
   }
+
+  void _showTrainingDetailsDialog(Training training) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(training.name),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Калории: ${_calculateCalories(training)} Ккал'),
+              const SizedBox(height: 8),
+              Text('Длительность: ${_calculateDuration(training)} минут'),
+              const SizedBox(height: 8),
+              Text('Упражнения:'),
+              const SizedBox(height: 8),
+              ...training.exercises.map((exercise) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 4.0),
+                  child: Text('- ${exercise.name}'),
+                );
+              }).toList(),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Закрыть'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 }
 
 class _TrainingAppBar extends StatelessWidget implements PreferredSizeWidget {
