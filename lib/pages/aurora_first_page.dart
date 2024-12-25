@@ -7,7 +7,6 @@ import 'package:aurora_fit/classes/gradient_button.dart';
 import 'package:aurora_fit/classes/fractional_stars.dart';
 import 'package:aurora_fit/pages/training_description_screen.dart';
 import 'package:aurora_fit/pages/choosing_of_training_screen.dart';
-import 'package:aurora_fit/pages/test_notification_page.dart';
 
 class AuroraFirstPage extends StatefulWidget {
   const AuroraFirstPage({Key? key}) : super(key: key);
@@ -112,7 +111,7 @@ class _AuroraFirstPageState extends State<AuroraFirstPage> {
                   // Переход на ScheduleScreen
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const TestNotificationPage()),
+                    MaterialPageRoute(builder: (context) => const ScheduleScreen()),
                   );
                 },
               ),
