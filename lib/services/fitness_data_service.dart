@@ -1,5 +1,3 @@
-// lib/services/fitness_data_service.dart
-
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/services.dart';
@@ -7,7 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import '../models/fitness_data.dart';
 
 class FitnessDataService {
-  final String _fileName = 'fitness_data.json';
+  final String _fileName = 'selected_workouts.json';
 
   Future<FitnessData> loadFitnessData() async {
     try {
@@ -17,9 +15,9 @@ class FitnessDataService {
         final jsonData = jsonDecode(jsonString);
         return FitnessData.fromJson(jsonData);
       } else {
-        // Если файл не существует, загрузите данные из assets
+        // Если файл не существует, загружаем из assets
         String assetString =
-            await rootBundle.loadString('lib/json/fitness_data.json');
+            await rootBundle.loadString('lib/json/selected_workouts.json');
         final jsonData = jsonDecode(assetString);
         FitnessData fitnessData = FitnessData.fromJson(jsonData);
         await saveFitnessData(fitnessData); // Сохраняем начальные данные
@@ -44,7 +42,7 @@ class FitnessDataService {
   }
 
   Future<File> _getLocalFile() async {
-    final directory = await getApplicationDocumentsDirectory();
+    final directory = await getApplicationSupportDirectory();
     return File('${directory.path}/$_fileName');
   }
 }
