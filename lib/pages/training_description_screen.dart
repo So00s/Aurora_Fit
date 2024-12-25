@@ -214,7 +214,7 @@ class _DescriptionOfTrainingState extends State<DescriptionOfTraining> {
                                       color: Colors.redAccent, size: 16),
                                   const SizedBox(width: 4),
                                   Text(
-                                    '${exercise.calories} Кал',
+                                    '${exercise.calories} кКал',
                                     style: const TextStyle(
                                       fontSize: 12,
                                       color: Colors.black54,

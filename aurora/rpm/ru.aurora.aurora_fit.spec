@@ -3,7 +3,7 @@
 
 Name: ru.aurora.aurora_fit
 Summary: Aurora Fit - текст.
-Version: 0.1.2.11
+Version: 0.1.2.13
 Release: 1
 License: Proprietary
 Source0: %{name}-%{version}.tar.zst
