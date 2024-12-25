@@ -2,18 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:aurora_fit/pages/aurora_first_page.dart';
 import 'package:path_provider/path_provider.dart';
 import 'services/notification_service.dart';
+import 'package:aurora_fit/pages/aurora_first_page.dart';
 
-final NotificationService notificationService = NotificationService();
-
-void main() {
+void main() async{
+  await notification_service.init();
   runApp(const AuroraFitApp());
 }
 
 class AuroraFitApp extends StatelessWidget {
   const AuroraFitApp({Key? key}) : super(key: key);
-
+  
   @override
   Widget build(BuildContext context) {
+    notification_service(
+    time(12, 44), // Планирует уведомление на 15:10
+    message("Hello"), // Сообщение уведомления
+  );
+      notification_service(
+    time(12, 46), // Планирует уведомление на 15:10
+    message("Loh"), // Сообщение уведомления
+  );
+      notification_service(
+    time(12, 48), // Планирует уведомление на 15:10
+    message("Test"), // Сообщение уведомления
+  );
     return MaterialApp(
       title: 'Aurora Fit',
       theme: ThemeData(
@@ -21,45 +33,5 @@ class AuroraFitApp extends StatelessWidget {
       ),
       home: const AuroraFirstPage(),
     );
-  }
-}
-
-class AppLifecycleObserver extends WidgetsBindingObserver {
-  final NotificationService notificationService;
-
-  AppLifecycleObserver(this.notificationService);
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-
-    if (state == AppLifecycleState.resumed) {
-      notificationService.scheduleNotification(17, 37);
-      notificationService.scheduleNotification(20, 39);
-      notificationService.scheduleNotification(20, 38);
-    }
-  }
-}
-
-class App extends StatefulWidget {
-  const App({Key? key}) : super(key: key);
-
-  @override
-  _AppState createState() => _AppState();
-}
-
-class _AppState extends State<App> {
-  final NotificationService notificationService = NotificationService();
-
-  @override
-  void initState() {
-    super.initState();
-    notificationService.initializeNotifications();
-    WidgetsBinding.instance.addObserver(AppLifecycleObserver(notificationService));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return const SizedBox.shrink();
   }
 }
