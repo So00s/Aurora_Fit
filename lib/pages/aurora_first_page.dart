@@ -9,7 +9,6 @@ import 'package:aurora_fit/pages/training_description_screen.dart';
 import 'package:aurora_fit/pages/choosing_of_training_screen.dart';
 import 'package:aurora_fit/pages/choosing_type_of_training_screen.dart';
 
-
 class AuroraFirstPage extends StatefulWidget {
   const AuroraFirstPage({Key? key}) : super(key: key);
 
@@ -113,7 +112,7 @@ class _AuroraFirstPageState extends State<AuroraFirstPage> {
                   // Переход на ScheduleScreen
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ChoosingTypeOfTrainingScreen()),
+                    MaterialPageRoute(builder: (context) => const ScheduleScreen()),
                   );
                 },
               ),
