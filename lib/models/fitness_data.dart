@@ -30,12 +30,14 @@ class FitnessData {
 class TrainingSlot {
   final String begintime; // Время начала тренировки
   final String category; // Категория тренировки (например, кардио, силовые и т.д.)
+  bool isCompleted;
   final WorkoutSummary workout; // Сводная информация о тренировке (объект WorkoutSummary)
 
   // Конструктор класса TrainingSlot
   TrainingSlot({
     required this.begintime, // Время начала тренировки
     required this.category, // Категория тренировки
+    required this.isCompleted,
     required this.workout, // Сводная информация о тренировке
   });
 
@@ -44,6 +46,7 @@ class TrainingSlot {
     return TrainingSlot(
       begintime: json['begintime'], // Время начала тренировки
       category: json['category'], // Категория тренировки
+      isCompleted: json['isCompleted'],
       workout: WorkoutSummary.fromJson(json['workout']), // Преобразуем сводную информацию о тренировке из JSON
     );
   }
@@ -53,6 +56,7 @@ class TrainingSlot {
     return {
       'begintime': begintime, // Время начала тренировки
       'category': category, // Категория тренировки
+      'isCompleted': isCompleted,
       'workout': workout.toJson(), // Преобразуем сводную информацию о тренировке в JSON
     };
   }

@@ -11,6 +11,7 @@ import 'package:aurora_fit/models/fitness_data.dart';
 import 'package:aurora_fit/models/types_of_trainings.dart';
 import 'package:aurora_fit/pages/training_description_screen.dart';
 import 'package:aurora_fit/services/types_of_trainings_service.dart';
+import 'package:aurora_fit/pages/schedule_screen.dart';
 
 class ChoosingOfTrainingScreen extends StatefulWidget {
   final String trainingType; // Тип тренировки (например, "cardio")
@@ -202,55 +203,101 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
         0, (sum, exercise) => sum + (exercise.calories ?? 0));
   }
 
-  void _showTimePickerDialog(String trainingType, Training training) {
-  String selectedTime = "08:00"; // Время по умолчанию
-  final List<String> availableTimes = [
-    "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00",
-    "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"
-  ]; // Список доступного времени
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Выберите время'),
-        content: SizedBox(
-          height: 200,
-          child: Column(
-            children: [
-              Expanded(
-                child: CupertinoPicker(
-                  scrollController: FixedExtentScrollController(
-                    initialItem: availableTimes.indexOf(selectedTime),
-                  ),
-                  itemExtent: 32.0,
-                  onSelectedItemChanged: (int index) {
-                    selectedTime = availableTimes[index];
-                  },
-                  children: availableTimes.map((time) => Text(time)).toList(),
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Отмена'),
-          ),
-          TextButton(
-            onPressed: () {
-              // _addTrainingToSchedule(selectedTime, trainingType, training);
-              // Navigator.of(context).pop();
-            },
-            child: const Text('Сохранить'),
-          ),
-        ],
+  Future<void> _addTrainingToSchedule(String begintime, String category, Training training) async {
+    try {
+      // Загрузка текущих данных
+      final fitnessData = await FitnessDataService().loadFitnessData();
+
+      // Создаем объект WorkoutSummary
+      final workout = WorkoutSummary(
+        name: training.name,
+        calories: _calculateCalories(training),
+        duration: _calculateDuration(training),
       );
-    },
-  );
-}
+
+      // Создаем новый слот тренировки
+      final newSlot = TrainingSlot(
+        begintime: begintime,
+        category: category,
+        isCompleted: false,
+        workout: workout,
+      );
+
+      // Добавляем тренировку в расписание
+      fitnessData.schedule[widget.dayOfWeek]?.add(newSlot);
+
+      // Сохраняем обновленные данные
+      await FitnessDataService().saveFitnessData(fitnessData);
+
+      // Переход на главный экран и обновление
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const ScheduleScreen()),
+        (route) => false,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Тренировка успешно добавлена!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка при сохранении: $e')),
+      );
+    }
+  }
+
+
+
+  void _showTimePickerDialog(String trainingType, Training training) {
+    String selectedTime = "08:00"; // Время по умолчанию
+    final List<String> availableTimes = [
+      "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00",
+      "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"
+    ]; // Список доступного времени
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Выберите время'),
+          content: SizedBox(
+            height: 200,
+            child: Column(
+              children: [
+                Expanded(
+                  child: CupertinoPicker(
+                    scrollController: FixedExtentScrollController(
+                      initialItem: availableTimes.indexOf(selectedTime),
+                    ),
+                    itemExtent: 32.0,
+                    onSelectedItemChanged: (int index) {
+                      selectedTime = availableTimes[index];
+                    },
+                    children: availableTimes.map((time) => Text(time)).toList(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Отмена'),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Добавляем тренировку в расписание
+                await _addTrainingToSchedule(selectedTime, trainingType, training);
+                // Navigator.of(context).pop(true); // Закрываем диалог
+              },
+              child: const Text('Сохранить'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
 }
 

@@ -1,5 +1,6 @@
 // lib/pages/aurora_first_page.dart
 
+import 'package:aurora_fit/pages/schedule_screen.dart';
 import 'package:flutter/material.dart';
 // import 'package:aurora_fit/pages/schedule_screen.dart';
 import 'package:aurora_fit/pages/aurora_training_types_page.dart';
@@ -112,7 +113,7 @@ class _AuroraFirstPageState extends State<AuroraFirstPage> {
                   // Переход на ScheduleScreen
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ChoosingTypeOfTrainingScreen(dayOfWeek: "Понедельник",)),
+                    MaterialPageRoute(builder: (context) => const ScheduleScreen()),
                   );
                 },
               ),
