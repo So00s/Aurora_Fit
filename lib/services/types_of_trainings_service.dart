@@ -9,12 +9,7 @@ class TypesOfTrainingsService {
 
   Future<TypesOfTrainings> loadTrainings() async {
     try {
-      final file = await _getLocalFile();
-      if (await file.exists()) {
-        String jsonString = await file.readAsString();
-        final jsonData = jsonDecode(jsonString);
-        return TypesOfTrainings.fromJson(jsonData);
-      } else {
+      
         // Если файл не существует, загружаем из assets
         String assetString =
             await rootBundle.loadString('lib/json/all_workouts.json');
@@ -22,8 +17,8 @@ class TypesOfTrainingsService {
         TypesOfTrainings typesOfTrainings = TypesOfTrainings.fromJson(jsonData);
         await saveTrainings(typesOfTrainings); // Сохраняем для использования
         return typesOfTrainings;
-      }
-    } catch (e, stackTrace) {
+    }
+    catch (e, stackTrace) {
       print('Ошибка при загрузке данных: $e');
       print(stackTrace);
       throw Exception('Не удалось загрузить тренировки');

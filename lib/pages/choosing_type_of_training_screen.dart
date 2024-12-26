@@ -1,13 +1,7 @@
 //lib/pages/choosing_type_of_training.dart
 
-import 'dart:convert';
 import 'package:aurora_fit/services/types_of_trainings_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import "package:aurora_fit/services/fitness_data_service.dart";
-import 'package:aurora_fit/models/exercise.dart' as ex;
-import 'package:aurora_fit/models/training.dart';
-import 'package:aurora_fit/models/fitness_data.dart';
 import 'package:aurora_fit/pages/choosing_of_training_screen.dart';
 import 'package:aurora_fit/models/types_of_trainings.dart';
 
@@ -15,7 +9,12 @@ import 'package:aurora_fit/models/types_of_trainings.dart';
 
 
 class ChoosingTypeOfTrainingScreen extends StatefulWidget {
-  const ChoosingTypeOfTrainingScreen({Key? key}) : super(key: key);
+  final String dayOfWeek;
+
+  const ChoosingTypeOfTrainingScreen({
+    Key? key,
+    required this.dayOfWeek,
+  }) : super(key: key);
 
   @override
   _TrainingTypeSelectionScreenState createState() => _TrainingTypeSelectionScreenState();
@@ -24,7 +23,7 @@ class ChoosingTypeOfTrainingScreen extends StatefulWidget {
 class _TrainingTypeSelectionScreenState extends State<ChoosingTypeOfTrainingScreen> {
   late Future<TypesOfTrainings> _fitnessDataFuture;
   TypesOfTrainings? _fitnessData;
-
+  
   @override
   void initState() {
     super.initState();
@@ -142,6 +141,7 @@ class _TrainingTypeSelectionScreenState extends State<ChoosingTypeOfTrainingScre
           context,
           MaterialPageRoute(
             builder: (context) => ChoosingOfTrainingScreen(
+              dayOfWeek: widget.dayOfWeek,
               trainingType: trainingType,
             ),
           ),

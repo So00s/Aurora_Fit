@@ -1,5 +1,6 @@
 //lib/pages/choosing_of_training_screen.dart
 
+import 'package:flutter/cupertino.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,9 +14,13 @@ import 'package:aurora_fit/services/types_of_trainings_service.dart';
 
 class ChoosingOfTrainingScreen extends StatefulWidget {
   final String trainingType; // Тип тренировки (например, "cardio")
+  final String dayOfWeek;
 
-  const ChoosingOfTrainingScreen({Key? key, required this.trainingType})
-      : super(key: key);
+  const ChoosingOfTrainingScreen({
+    Key? key, 
+    required this.trainingType,
+    required this.dayOfWeek,
+    }) : super(key: key);
 
   @override
   _TrainingListScreenState createState() => _TrainingListScreenState();
@@ -129,7 +134,7 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              '${_calculateDuration(training)} минут',
+              _calculateDuration(training),
               style: const TextStyle(
                 fontSize: 14,
                 color: Colors.black54,
@@ -160,7 +165,7 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Логика выбора тренировки
+                    _showTimePickerDialog(widget.trainingType, training);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 239, 85, 8),
@@ -175,37 +180,55 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
     );
   }
 
-  int _calculateDuration(Training training) {
-    return training.exercises.length; // Пример: количество упражнений = минуты
-  }
+  String _calculateDuration(Training training) {
+  final totalSeconds = training.exercises.fold<int>(0, (totalDuration, exercise) {
+    // Парсим время упражнения в минуты и секунды
+    final parts = exercise.time.split(':');
+    final minutes = int.tryParse(parts[0]) ?? 0;
+    final seconds = int.tryParse(parts.length > 1 ? parts[1] : '0') ?? 0;
+
+    // Считаем общее время в секундах
+    return totalDuration + (minutes * 60 + seconds);
+  });
+
+  // Преобразуем общее время обратно в формат MM:SS
+  final minutes = totalSeconds ~/ 60;
+  final seconds = totalSeconds % 60;
+  return '$minutes:${seconds.toString().padLeft(2, '0')}';
+}
 
   int _calculateCalories(Training training) {
     return training.exercises.fold(
         0, (sum, exercise) => sum + (exercise.calories ?? 0));
   }
 
-  void _showTrainingDetailsDialog(Training training) {
+  void _showTimePickerDialog(String trainingType, Training training) {
+  String selectedTime = "08:00"; // Время по умолчанию
+  final List<String> availableTimes = [
+    "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00",
+    "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"
+  ]; // Список доступного времени
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text(training.name),
-        content: SingleChildScrollView(
+        title: const Text('Выберите время'),
+        content: SizedBox(
+          height: 200,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Калории: ${_calculateCalories(training)} Ккал'),
-              const SizedBox(height: 8),
-              Text('Длительность: ${_calculateDuration(training)} минут'),
-              const SizedBox(height: 8),
-              Text('Упражнения:'),
-              const SizedBox(height: 8),
-              ...training.exercises.map((exercise) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 4.0),
-                  child: Text('- ${exercise.name}'),
-                );
-              }).toList(),
+              Expanded(
+                child: CupertinoPicker(
+                  scrollController: FixedExtentScrollController(
+                    initialItem: availableTimes.indexOf(selectedTime),
+                  ),
+                  itemExtent: 32.0,
+                  onSelectedItemChanged: (int index) {
+                    selectedTime = availableTimes[index];
+                  },
+                  children: availableTimes.map((time) => Text(time)).toList(),
+                ),
+              ),
             ],
           ),
         ),
@@ -214,7 +237,14 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: const Text('Закрыть'),
+            child: const Text('Отмена'),
+          ),
+          TextButton(
+            onPressed: () {
+              // _addTrainingToSchedule(selectedTime, trainingType, training);
+              // Navigator.of(context).pop();
+            },
+            child: const Text('Сохранить'),
           ),
         ],
       );
