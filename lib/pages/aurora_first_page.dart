@@ -1,12 +1,12 @@
 // lib/pages/aurora_first_page.dart
 
 import 'package:flutter/material.dart';
-import 'package:aurora_fit/pages/schedule_screen.dart';
+// import 'package:aurora_fit/pages/schedule_screen.dart';
 import 'package:aurora_fit/pages/aurora_training_types_page.dart';
 import 'package:aurora_fit/classes/gradient_button.dart';
 import 'package:aurora_fit/classes/fractional_stars.dart';
-import 'package:aurora_fit/pages/training_description_screen.dart';
-import 'package:aurora_fit/pages/choosing_of_training_screen.dart';
+// import 'package:aurora_fit/pages/training_description_screen.dart';
+// import 'package:aurora_fit/pages/choosing_of_training_screen.dart';
 import 'package:aurora_fit/pages/choosing_type_of_training_screen.dart';
 
 class AuroraFirstPage extends StatefulWidget {
@@ -112,7 +112,7 @@ class _AuroraFirstPageState extends State<AuroraFirstPage> {
                   // Переход на ScheduleScreen
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ScheduleScreen()),
+                    MaterialPageRoute(builder: (context) => const ChoosingTypeOfTrainingScreen()),
                   );
                 },
               ),

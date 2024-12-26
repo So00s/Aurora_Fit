@@ -9,7 +9,7 @@ import 'package:aurora_fit/models/training.dart';
 import 'package:aurora_fit/models/fitness_data.dart';
 import 'package:aurora_fit/models/types_of_trainings.dart';
 import 'package:aurora_fit/pages/training_description_screen.dart';
-import 'package:aurora_fit/services/types_of_training_service.dart';
+import 'package:aurora_fit/services/types_of_trainings_service.dart';
 
 class ChoosingOfTrainingScreen extends StatefulWidget {
   final String trainingType; // Тип тренировки (например, "cardio")
@@ -30,7 +30,7 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
   @override
   void initState() {
     super.initState();
-    _trainingDataFuture = TypesOfDataService().loadFitnessData();
+    _trainingDataFuture = TypesOfTrainingsService().loadTrainings();
     _fitnessDataFuture = FitnessDataService().loadFitnessData();
   }
 

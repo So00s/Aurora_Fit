@@ -1,7 +1,7 @@
 //lib/pages/choosing_type_of_training.dart
 
 import 'dart:convert';
-import 'package:aurora_fit/services/types_of_training_service.dart';
+import 'package:aurora_fit/services/types_of_trainings_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import "package:aurora_fit/services/fitness_data_service.dart";
@@ -28,7 +28,7 @@ class _TrainingTypeSelectionScreenState extends State<ChoosingTypeOfTrainingScre
   @override
   void initState() {
     super.initState();
-    _fitnessDataFuture = TypesOfDataService().loadFitnessData();
+    _fitnessDataFuture = TypesOfTrainingsService().loadTrainings();
   }
 
   @override
