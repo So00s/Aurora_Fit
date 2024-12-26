@@ -2,8 +2,9 @@
     "Понедельник": [
       {
         "time": "08:00",
+        "title": "Кардио",
         "training": {
-          "name": "Cardio Blast",
+          "name": "Первая тренировка",
           "exercises": [
             {
               "name": "Jumping Jacks",

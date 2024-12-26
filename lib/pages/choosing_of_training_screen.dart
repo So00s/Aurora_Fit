@@ -160,7 +160,7 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Логика выбора тренировки
+                    _showTrainingDetailsDialog(widget.trainingType, _getTrainingTypeTitle(), training);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 239, 85, 8),
@@ -184,30 +184,33 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
         0, (sum, exercise) => sum + (exercise.calories ?? 0));
   }
 
-  void _showTrainingDetailsDialog(Training training) {
+  void _showTrainingDetailsDialog(String trainingType, String trainingTitle, Training training) {
+  final Map<String, dynamic> trainingData = {
+    trainingType: {
+      'title': trainingTitle,
+      training.name: {
+        'name': training.name,
+        'exercises': training.exercises.map((exercise) {
+          return {
+            'name': exercise.name,
+            'description': exercise.description,
+            'time': exercise.time,
+            'calories': exercise.calories
+          };
+        }).toList(),
+      },
+    },
+  };
+
+  final String jsonData = const JsonEncoder.withIndent('  ').convert(trainingData);
+
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text(training.name),
+        title: const Text('Данные тренировки'),
         content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Калории: ${_calculateCalories(training)} Ккал'),
-              const SizedBox(height: 8),
-              Text('Длительность: ${_calculateDuration(training)} минут'),
-              const SizedBox(height: 8),
-              Text('Упражнения:'),
-              const SizedBox(height: 8),
-              ...training.exercises.map((exercise) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 4.0),
-                  child: Text('- ${exercise.name}'),
-                );
-              }).toList(),
-            ],
-          ),
+          child: Text(jsonData),
         ),
         actions: [
           TextButton(
@@ -220,7 +223,7 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
       );
     },
   );
-}
+} 
 
 }
 
