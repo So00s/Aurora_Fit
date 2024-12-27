@@ -189,24 +189,48 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       text: "Начать заново",
                       onPressed: () async {
                         if (_fitnessData != null) {
-                          setState(() {
-                            // Очищаем и перезаписываем содержимое schedule
-                            _fitnessData!.schedule.clear();
-                            _fitnessData!.schedule.addAll({
-                              "Понедельник": [],
-                              "Вторник": [],
-                              "Среда": [],
-                              "Четверг": [],
-                              "Пятница": [],
-                              "Суббота": [],
-                              "Воскресенье": [],
-                            });
-                          });
-                          await _saveData();
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Расписание очищено!')),
+                          // Показать окно подтверждения
+                          final shouldClear = await showDialog<bool>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Подтверждение'),
+                                content: const Text(
+                                    'Вы уверены, что хотите очистить расписание? Это действие нельзя отменить.'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.of(context).pop(false), // Отмена
+                                    child: const Text('Отмена'),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () => Navigator.of(context).pop(true), // Подтверждение
+                                    child: const Text('Да, очистить'),
+                                  ),
+                                ],
+                              );
+                            },
                           );
+
+                          if (shouldClear == true) {
+                            // Если пользователь подтвердил
+                            setState(() {
+                              _fitnessData!.schedule.clear();
+                              _fitnessData!.schedule.addAll({
+                                "Понедельник": [],
+                                "Вторник": [],
+                                "Среда": [],
+                                "Четверг": [],
+                                "Пятница": [],
+                                "Суббота": [],
+                                "Воскресенье": [],
+                              });
+                            });
+                            await _saveData();
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Расписание очищено!')),
+                            );
+                          }
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Ошибка: данные отсутствуют')),
