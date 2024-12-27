@@ -2,13 +2,8 @@
 
 import 'package:aurora_fit/pages/schedule_screen.dart';
 import 'package:flutter/material.dart';
-// import 'package:aurora_fit/pages/schedule_screen.dart';
-import 'package:aurora_fit/pages/aurora_training_types_page.dart';
 import 'package:aurora_fit/classes/gradient_button.dart';
 import 'package:aurora_fit/classes/fractional_stars.dart';
-// import 'package:aurora_fit/pages/training_description_screen.dart';
-// import 'package:aurora_fit/pages/choosing_of_training_screen.dart';
-import 'package:aurora_fit/pages/choosing_type_of_training_screen.dart';
 import 'package:aurora_fit/models/fitness_data.dart'; 
 import 'package:aurora_fit/services/fitness_data_service.dart';
 
@@ -125,10 +120,10 @@ class _AuroraFirstPageState extends State<AuroraFirstPage> {
                     size: 40,
                   ),
                   const SizedBox(height: 10),
-                  Text(
-                    'Ваш прогресс за неделю\n(${_progress.toStringAsPrecision(2)} из 5 звёзд)',
+                  const Text(
+                    'Ваш прогресс за неделю',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),

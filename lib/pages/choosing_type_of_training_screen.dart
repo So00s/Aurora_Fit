@@ -83,9 +83,9 @@ class _TrainingTypeSelectionScreenState extends State<ChoosingTypeOfTrainingScre
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Text(
+                  const Text(
                     'Типы тренировок',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Color.fromARGB(255, 100, 4, 185),

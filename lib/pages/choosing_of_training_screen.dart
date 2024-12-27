@@ -1,17 +1,16 @@
 //lib/pages/choosing_of_training_screen.dart
 
 import 'package:flutter/cupertino.dart';
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import "package:aurora_fit/services/fitness_data_service.dart";
-import 'package:aurora_fit/models/exercise.dart' as ex;
 import 'package:aurora_fit/models/training.dart';
 import 'package:aurora_fit/models/fitness_data.dart';
 import 'package:aurora_fit/models/types_of_trainings.dart';
 import 'package:aurora_fit/pages/training_description_screen.dart';
 import 'package:aurora_fit/services/types_of_trainings_service.dart';
 import 'package:aurora_fit/pages/schedule_screen.dart';
+
+
 
 class ChoosingOfTrainingScreen extends StatefulWidget {
   final String trainingType; // Тип тренировки (например, "cardio")
@@ -160,7 +159,7 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
                   child: const Text(
                     'подробнее',
                     style: TextStyle(
-                      color: Color.fromARGB(255, 100, 4, 185),
+                      color: Colors.black,
                     ),
                   ),
                 ),
@@ -171,7 +170,10 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 239, 85, 8),
                   ),
-                  child: const Text('выбрать'),
+                  child: const Text(
+                    'выбрать',
+                    style: TextStyle(color: Colors.white),
+                    ),
                 ),
               ],
             ),
@@ -328,59 +330,6 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
     }
   }
 
-
-
-  // void _showTimePickerDialog(String trainingType, Training training) {
-  //   String selectedTime = "08:00"; // Время по умолчанию
-  //   final List<String> availableTimes = [
-  //     "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00",
-  //     "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"
-  //   ]; // Список доступного времени
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: const Text('Выберите время'),
-  //         content: SizedBox(
-  //           height: 200,
-  //           child: Column(
-  //             children: [
-  //               Expanded(
-  //                 child: CupertinoPicker(
-  //                   scrollController: FixedExtentScrollController(
-  //                     initialItem: availableTimes.indexOf(selectedTime),
-  //                   ),
-  //                   itemExtent: 32.0,
-  //                   onSelectedItemChanged: (int index) {
-  //                     selectedTime = availableTimes[index];
-  //                   },
-  //                   children: availableTimes.map((time) => Text(time)).toList(),
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //             },
-  //             child: const Text('Отмена'),
-  //           ),
-  //           TextButton(
-  //             onPressed: () async {
-  //               // Добавляем тренировку в расписание
-  //               await _addTrainingToSchedule(selectedTime, trainingType, training);
-  //               // Navigator.of(context).pop(true); // Закрываем диалог
-  //             },
-  //             child: const Text('Сохранить'),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-
 }
 
 class _TrainingAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -461,5 +410,5 @@ class _TrainingAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(120); // Размер AppBar
+  Size get preferredSize => const Size.fromHeight(80); // Размер AppBar
 }

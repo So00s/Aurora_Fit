@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:aurora_fit/services/fitness_data_service.dart';
-import 'package:aurora_fit/pages/training_selection_page.dart';
-import 'package:aurora_fit/models/exercise.dart' as ex; // Псевдоним для Exercise
+
 import 'package:aurora_fit/models/fitness_data.dart';
-import 'package:aurora_fit/classes/gradient_button.dart'; 
-import 'package:aurora_fit/pages/start_training_page.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class AuroraTrainingTypesPage extends StatefulWidget {
   const AuroraTrainingTypesPage({Key? key}) : super(key: key);

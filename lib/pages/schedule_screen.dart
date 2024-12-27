@@ -1,12 +1,10 @@
 //lib/pages/schedule_screen.dart
 
+import 'package:aurora_fit/classes/gradient_button.dart';
 import 'package:aurora_fit/pages/aurora_first_page.dart';
 import 'package:flutter/material.dart';
 import 'package:aurora_fit/services/fitness_data_service.dart';
-import 'package:aurora_fit/pages/training_selection_page.dart';
 import 'package:aurora_fit/models/fitness_data.dart';
-import 'package:aurora_fit/models/training.dart';
-import 'package:collection/collection.dart';
 import 'package:aurora_fit/pages/choosing_type_of_training_screen.dart';
 import 'package:aurora_fit/pages/start_training_page.dart';
 import 'package:aurora_fit/services/found_workout.dart';
@@ -86,14 +84,21 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       backgroundColor: const Color.fromARGB(255, 248, 248, 248),
       appBar: AppBar(
       backgroundColor: const Color.fromARGB(255, 248, 248, 248),
-      automaticallyImplyLeading: true,
+      automaticallyImplyLeading: false,
       elevation: 0,
       flexibleSpace: Padding(
         padding: const EdgeInsets.only(top: 30),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-
+            IconButton(
+              icon: const Icon(Icons.arrow_back,
+                  color: Color.fromARGB(255, 239, 85, 8)),
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (context) => AuroraFirstPage()),);
+              },
+            ),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -127,9 +132,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Text(
+                  const Text(
                     'Расписание тренировок',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Color.fromARGB(255, 100, 4, 185),
@@ -152,22 +157,45 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             return Center(child: Text('Ошибка: ${snapshot.error}'));
           } else if (snapshot.hasData) {
             _fitnessData = snapshot.data;
-            return ListView(
-              padding: const EdgeInsets.all(16.0),
-              children: _fitnessData!.schedule.entries.map((entry) {
-                String day = entry.key; // День недели
-                List<TrainingSlot> slots = entry.value; // Тренировки в этот день
-                return DaySchedule(
-                  day: day,
-                  slots: slots,
-                  onChooseTraining: (day) {
-                    _openChoosingTypeOfTrainingScreen(day);
-                  },
-                  onSelectSlot: (slot) {
-                    _navigateToStartTraining(day, slot);
-                  },
-                );
-              }).toList(),
+            
+            return Column(
+              children: [
+                // Список тренировок
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.all(16.0),
+                    children: _fitnessData!.schedule.entries.map((entry) {
+                      return DaySchedule(
+                        day: entry.key,
+                        slots: entry.value,
+                        onChooseTraining: (day) {
+                          _openChoosingTypeOfTrainingScreen(day);
+                        },
+                        onSelectSlot: (slot) {
+                          _navigateToStartTraining(entry.key, slot);
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ),
+                // Кнопка внизу
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.transparent, // Прозрачный фон
+                    ),
+                    child: GradientButton(
+                      text: "Начать заново",
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Начать заново')),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
             );
           } else {
             return const Center(child: Text('Нет данных'));
@@ -205,20 +233,14 @@ class DaySchedule extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton(
+                IconButton(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Кнопка "изм." нажата')),
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey.shade300,
-                    elevation: 0,
-                  ),
-                  child: const Text(
-                    'изм.',
-                    style: TextStyle(color: Colors.black),
-                  ),
+                  icon: const Icon(Icons.edit,
+                    color: Colors.black,),
                 ),
                 Text(
                   day,
@@ -287,7 +309,11 @@ class DaySchedule extends StatelessWidget {
                           const SizedBox(height: 8),
                           slot.isCompleted
                               ? ElevatedButton(
-                                  onPressed: () => onSelectSlot(slot),
+                                  onPressed: (){
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Вы большой молодец!')),
+                                      );
+                                    },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color.fromARGB(255, 192, 255, 200),
                                     side: const BorderSide( // Добавляем обводку
@@ -295,7 +321,7 @@ class DaySchedule extends StatelessWidget {
                                       width: 2, // Толщина обводки
                                     ),
                                   ),
-                                  child: const Text('выполнено', style: TextStyle(color: Colors.grey),),
+                                  child: const Text('выполнено', style: TextStyle(color: Colors.black),),
                                 )
                               : ElevatedButton(
                                   onPressed: () => onSelectSlot(slot),

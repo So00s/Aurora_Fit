@@ -1,39 +1,9 @@
 {
   "Понедельник": [
-    {
-      "begintime": "08:00",
-      "category": "cardio",
-      "isCompleted": false,
-      "workout": {
-        "name": "Первая тренировка",
-        "calories": 33,
-        "duration": "3:00"
-      }
-    },
-    {
-      "begintime": "11:00",
-      "category": "cardio",
-      "isCompleted": false,
-      "workout": {
-        "name": "Первая тренировка",
-        "calories": 33,
-        "duration": "3:00"
-      }
-    }
   ],
   "Вторник": [],
   "Среда": [],
   "Четверг": [
-    {
-      "begintime": "08:00",
-      "category": "cardio",
-      "isCompleted": true,
-      "workout": {
-        "name": "Первая тренировка",
-        "calories": 33,
-        "duration": "3:00"
-      }
-    }
   ],
   "Пятница": [],
   "Суббота": [],
