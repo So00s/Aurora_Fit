@@ -9,6 +9,7 @@ import 'package:aurora_fit/models/training.dart';
 import 'package:collection/collection.dart';
 import 'package:aurora_fit/pages/choosing_type_of_training_screen.dart';
 import 'package:aurora_fit/pages/start_training_page.dart';
+import 'package:aurora_fit/services/found_workout.dart';
 
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({Key? key}) : super(key: key);
@@ -21,7 +22,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   late Future<FitnessData> _fitnessDataFuture;
   FitnessData? _fitnessData;
   final FitnessDataService _fitnessDataService = FitnessDataService();
-
+  final WorkoutService _workoutService = WorkoutService();
   @override
   void initState() {
     super.initState();
@@ -45,34 +46,33 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
 
 
-  void _navigateToTrainingSelection(String day, String begintime) async {
-    // Найти тренировку в расписании
-    var slot = _fitnessData?.schedule[day]?.firstWhereOrNull(
-      (slot) => slot.begintime == begintime,
-    );
+  void _navigateToStartTraining(String day, TrainingSlot slot) async {
+    final training = await _workoutService.findTraining(slot.category, slot.workout.name);
 
-    if (slot != null && slot.workout != null) {
+    if (training != null) {
       final isCompleted = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => AuroraFirstPage(),
+          builder: (context) => StartTrainingPage(training: training),
         ),
       );
 
       if (isCompleted == true) {
-        // Обновить статус тренировки как завершенной
+        // Обновляем статус тренировки
         setState(() {
-          slot.isCompleted = true; // Предполагается, что есть поле isCompleted
+          slot.isCompleted = true;
         });
+
+        // Сохраняем обновленные данные
         _saveData();
       }
     } else {
-      // Если тренировка не найдена
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Нет тренировки для этого времени')),
+        const SnackBar(content: Text('Не удалось найти тренировку')),
       );
     }
   }
+
 
   Future<void> _saveData() async {
     if (_fitnessData != null) {
@@ -85,9 +85,64 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 248, 248, 248),
       appBar: AppBar(
-        title: const Text('Расписание тренировок'),
-        backgroundColor: const Color.fromARGB(255, 239, 85, 8),
+      backgroundColor: const Color.fromARGB(255, 248, 248, 248),
+      automaticallyImplyLeading: true,
+      elevation: 0,
+      flexibleSpace: Padding(
+        padding: const EdgeInsets.only(top: 30),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'AURORA',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(255, 239, 85, 8),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Text(
+                        'FIT',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(255, 100, 4, 185),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Image.asset(
+                        'assets/images/full.png',
+                        height: 30,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Расписание тренировок',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 100, 4, 185),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
+    ),
       body: FutureBuilder<FitnessData>(
         future: _fitnessDataFuture,
         builder: (context, snapshot) {
@@ -109,7 +164,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     _openChoosingTypeOfTrainingScreen(day);
                   },
                   onSelectSlot: (slot) {
-                    _navigateToTrainingSelection(day, slot.begintime);
+                    _navigateToStartTraining(day, slot);
                   },
                 );
               }).toList(),
@@ -127,7 +182,7 @@ class DaySchedule extends StatelessWidget {
   final String day;
   final List<TrainingSlot> slots;
   final Function(String) onChooseTraining;
-  final Function(TrainingSlot) onSelectSlot; // Выбрать слот
+  final Function(TrainingSlot) onSelectSlot;
 
   const DaySchedule({
     Key? key,
@@ -142,37 +197,121 @@ class DaySchedule extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 16.0),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              day,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            ...slots.map((slot) {
-              return ListTile(
-                title: Text(slot.begintime),
-                subtitle: slot.workout != null
-                    ? Text(slot.workout!.name)
-                    : const Text('Тренировка не выбрана'),
-                trailing: IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () => onSelectSlot(slot),
+            // Заголовок дня с кнопками
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Кнопка "изм." нажата')),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey.shade300,
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'изм.',
+                    style: TextStyle(color: Colors.black),
+                  ),
                 ),
+                Text(
+                  day,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () => onChooseTraining(day),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ...slots.map((slot) {
+              return Column(
+                children: [
+                  Row(
+                    children: [
+                      // Время и категория
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              slot.begintime.toUpperCase(),
+                              style: const TextStyle(
+                                fontSize: 40,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'Категория: ${slot.category}',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Время + калории + статус
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            '${slot.workout.duration} мин',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            '${slot.workout.calories} Ккал',
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(height: 8),
+                          slot.isCompleted
+                              ? ElevatedButton(
+                                  onPressed: () => onSelectSlot(slot),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color.fromARGB(255, 192, 255, 200),
+                                    side: const BorderSide( // Добавляем обводку
+                                      color: Color(0x00000021), // Цвет обводки
+                                      width: 2, // Толщина обводки
+                                    ),
+                                  ),
+                                  child: const Text('выполнено', style: TextStyle(color: Colors.grey),),
+                                )
+                              : ElevatedButton(
+                                  onPressed: () => onSelectSlot(slot),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xEFEFEFFF),
+                                    side: const BorderSide( // Добавляем обводку
+                                      color: Color(0x00000021), // Цвет обводки
+                                      width: 2, // Толщина обводки
+                                    ),
+                                  ),
+                                  child: const Text('начать', style: TextStyle(color: Colors.grey),),
+                                ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 32),
+                ],
               );
             }).toList(),
-            TextButton.icon(
-              onPressed: () {
-                onChooseTraining(day);
-              },
-              icon: const Icon(Icons.add),
-              label: const Text('Добавить тренировку'),
-            ),
+            if (slots.isEmpty)
+              const Center(
+                child: Text(
+                  'Пока что тренировок нет...',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
           ],
         ),
       ),

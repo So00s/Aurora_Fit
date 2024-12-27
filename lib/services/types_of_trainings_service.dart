@@ -37,7 +37,7 @@ class TypesOfTrainingsService {
   }
 
   Future<File> _getLocalFile() async {
-    final directory = await getApplicationDocumentsDirectory();
+    final directory = await getApplicationSupportDirectory();
     return File('${directory.path}/$_fileName');
   }
 }

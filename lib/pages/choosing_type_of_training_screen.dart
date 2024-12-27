@@ -35,24 +35,70 @@ class _TrainingTypeSelectionScreenState extends State<ChoosingTypeOfTrainingScre
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 248, 248, 248),
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 248, 248, 248),
-        elevation: 0,
-        title: const Text(
-          'AURORA FIT',
-          style: TextStyle(
-            color: Color.fromARGB(255, 239, 85, 8),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back,
-              color: Color.fromARGB(255, 239, 85, 8)),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+      backgroundColor: const Color.fromARGB(255, 248, 248, 248),
+      automaticallyImplyLeading: false,
+      elevation: 0,
+      flexibleSpace: Padding(
+        padding: const EdgeInsets.only(top: 30),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back,
+                  color: Color.fromARGB(255, 239, 85, 8)),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'AURORA',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(255, 239, 85, 8),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Text(
+                        'FIT',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(255, 100, 4, 185),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Image.asset(
+                        'assets/images/full.png',
+                        height: 30,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Типы тренировок',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 100, 4, 185),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
+    ),
       body: FutureBuilder<TypesOfTrainings>(
         future: _fitnessDataFuture,
         builder: (context, snapshot) {
@@ -80,14 +126,6 @@ class _TrainingTypeSelectionScreenState extends State<ChoosingTypeOfTrainingScre
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Типы тренировок',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color.fromARGB(255, 100, 4, 185),
-            ),
-          ),
           const SizedBox(height: 16),
           Expanded(
             child: GridView.builder(

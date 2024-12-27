@@ -198,6 +198,83 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
   return '$minutes:${seconds.toString().padLeft(2, '0')}';
 }
 
+  void _showTimePickerDialog(String trainingType, Training training) {
+    int selectedHour = 8; // Время по умолчанию (час)
+    int selectedMinute = 0; // Время по умолчанию (минута)
+
+    final List<int> availableHours = List.generate(24, (index) => index); // Список доступных часов (0-23)
+    final List<int> availableMinutes = List.generate(60, (index) => index); // Список доступных минут (0-59)
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Выберите время'),
+          content: SizedBox(
+            height: 200,
+            child: Row(
+              children: [
+                // Выбор часа
+                Expanded(
+                  child: CupertinoPicker(
+                    scrollController: FixedExtentScrollController(
+                      initialItem: selectedHour,
+                    ),
+                    itemExtent: 32.0,
+                    onSelectedItemChanged: (int index) {
+                      selectedHour = availableHours[index];
+                    },
+                    children: availableHours.map((hour) => Text(hour.toString().padLeft(2, '0'))).toList(),
+                  ),
+                ),
+                // Выбор минуты
+                Expanded(
+                  child: CupertinoPicker(
+                    scrollController: FixedExtentScrollController(
+                      initialItem: selectedMinute,
+                    ),
+                    itemExtent: 32.0,
+                    onSelectedItemChanged: (int index) {
+                      selectedMinute = availableMinutes[index];
+                    },
+                    children: availableMinutes.map((minute) => Text(minute.toString().padLeft(2, '0'))).toList(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Закрытие диалога
+              },
+              child: const Text('Отмена'),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Формируем строку времени, проверяя корректность значений
+                String selectedTime = "${selectedHour.toString().padLeft(2, '0')}:${selectedMinute.toString().padLeft(2, '0')}";
+                
+                // Убедимся, что значения времени корректны
+                if (selectedHour < 0 || selectedHour > 23 || selectedMinute < 0 || selectedMinute > 59) {
+                  print("Ошибка: некорректное время");
+                  // Navigator.of(context).pop(); // Закрываем диалог
+                  return;
+                }
+
+                // Добавляем тренировку в расписание
+                await _addTrainingToSchedule(selectedTime, trainingType, training);
+                // Navigator.of(context).pop(); // Закрываем диалог
+              },
+              child: const Text('Сохранить'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
   int _calculateCalories(Training training) {
     return training.exercises.fold(
         0, (sum, exercise) => sum + (exercise.calories ?? 0));
@@ -229,12 +306,17 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
       // Сохраняем обновленные данные
       await FitnessDataService().saveFitnessData(fitnessData);
 
-      // Переход на главный экран и обновление
+      //Переход на главный экран и обновление
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const ScheduleScreen()),
         (route) => false,
       );
+      
+      // Navigator.push(
+      //               context,
+      //               MaterialPageRoute(builder: (context) => const ScheduleScreen()),
+      //             );
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Тренировка успешно добавлена!')),
@@ -248,56 +330,56 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
 
 
 
-  void _showTimePickerDialog(String trainingType, Training training) {
-    String selectedTime = "08:00"; // Время по умолчанию
-    final List<String> availableTimes = [
-      "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00",
-      "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"
-    ]; // Список доступного времени
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Выберите время'),
-          content: SizedBox(
-            height: 200,
-            child: Column(
-              children: [
-                Expanded(
-                  child: CupertinoPicker(
-                    scrollController: FixedExtentScrollController(
-                      initialItem: availableTimes.indexOf(selectedTime),
-                    ),
-                    itemExtent: 32.0,
-                    onSelectedItemChanged: (int index) {
-                      selectedTime = availableTimes[index];
-                    },
-                    children: availableTimes.map((time) => Text(time)).toList(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Отмена'),
-            ),
-            TextButton(
-              onPressed: () async {
-                // Добавляем тренировку в расписание
-                await _addTrainingToSchedule(selectedTime, trainingType, training);
-                // Navigator.of(context).pop(true); // Закрываем диалог
-              },
-              child: const Text('Сохранить'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // void _showTimePickerDialog(String trainingType, Training training) {
+  //   String selectedTime = "08:00"; // Время по умолчанию
+  //   final List<String> availableTimes = [
+  //     "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00",
+  //     "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"
+  //   ]; // Список доступного времени
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: const Text('Выберите время'),
+  //         content: SizedBox(
+  //           height: 200,
+  //           child: Column(
+  //             children: [
+  //               Expanded(
+  //                 child: CupertinoPicker(
+  //                   scrollController: FixedExtentScrollController(
+  //                     initialItem: availableTimes.indexOf(selectedTime),
+  //                   ),
+  //                   itemExtent: 32.0,
+  //                   onSelectedItemChanged: (int index) {
+  //                     selectedTime = availableTimes[index];
+  //                   },
+  //                   children: availableTimes.map((time) => Text(time)).toList(),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //             },
+  //             child: const Text('Отмена'),
+  //           ),
+  //           TextButton(
+  //             onPressed: () async {
+  //               // Добавляем тренировку в расписание
+  //               await _addTrainingToSchedule(selectedTime, trainingType, training);
+  //               // Navigator.of(context).pop(true); // Закрываем диалог
+  //             },
+  //             child: const Text('Сохранить'),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
 }
 
