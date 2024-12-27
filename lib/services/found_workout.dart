@@ -29,4 +29,14 @@ class WorkoutService {
     }
     return null; // Тренировка не найдена
   }
+
+    // Получение названия категории
+  Future<String> getCategoryTitle(String category) async {
+    final allWorkouts = await loadAllWorkouts();
+    if (allWorkouts.containsKey(category)) {
+      final categoryData = allWorkouts[category];
+      return categoryData['title'] ?? 'Зарядка';
+    }
+    return 'Зарядка';
+  }
 }

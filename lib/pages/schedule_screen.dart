@@ -248,12 +248,23 @@ class DaySchedule extends StatelessWidget {
                               slot.begintime.toUpperCase(),
                               style: const TextStyle(
                                 fontSize: 40,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w300,
                               ),
                             ),
-                            Text(
-                              'Категория: ${slot.category}',
-                              style: const TextStyle(fontSize: 16),
+                            FutureBuilder<String>(
+                              future: WorkoutService().getCategoryTitle(slot.category),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return const Text('Загрузка...');
+                                } else if (snapshot.hasError) {
+                                  return const Text('Ошибка');
+                                } else {
+                                  return Text(
+                                    '${snapshot.data}',
+                                    style: const TextStyle(fontSize: 16),
+                                  );
+                                }
+                              },
                             ),
                           ],
                         ),
