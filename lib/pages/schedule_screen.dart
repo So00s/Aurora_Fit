@@ -206,7 +206,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 }
 
-class DaySchedule extends StatelessWidget {
+class DaySchedule extends StatefulWidget {
   final String day;
   final List<TrainingSlot> slots;
   final Function(String) onChooseTraining;
@@ -219,6 +219,52 @@ class DaySchedule extends StatelessWidget {
     required this.onChooseTraining,
     required this.onSelectSlot,
   }) : super(key: key);
+
+  @override
+  _DayScheduleState createState() => _DayScheduleState();
+}
+
+class _DayScheduleState extends State<DaySchedule> {
+  bool _isEditMode = false;
+
+  Future<void> _removeTraining(TrainingSlot slot) async {
+    try {
+      final fitnessData = await FitnessDataService().loadFitnessData();
+
+      final daySchedule = fitnessData.schedule[widget.day];
+
+      if (daySchedule == null || daySchedule.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Расписание на этот день пустое.')),
+        );
+        return;
+      }
+
+      final slotIndex = daySchedule.indexWhere((s) =>
+          s.begintime == slot.begintime && s.category == slot.category);
+
+      if (slotIndex != -1) {
+        daySchedule.removeAt(slotIndex);
+        await FitnessDataService().saveFitnessData(fitnessData);
+
+        setState(() {
+          widget.slots.remove(slot);
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Тренировка успешно удалена!')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Слот для удаления не найден.')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -235,15 +281,17 @@ class DaySchedule extends StatelessWidget {
               children: [
                 IconButton(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Кнопка "изм." нажата')),
-                    );
+                    setState(() {
+                      _isEditMode = !_isEditMode;
+                    });
                   },
-                  icon: const Icon(Icons.edit,
-                    color: Colors.black,),
+                  icon: Icon(
+                    _isEditMode ? Icons.check : Icons.edit,
+                    color: Colors.black,
+                  ),
                 ),
                 Text(
-                  day,
+                  widget.day,
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -251,98 +299,119 @@ class DaySchedule extends StatelessWidget {
                 ),
                 IconButton(
                   icon: const Icon(Icons.add),
-                  onPressed: () => onChooseTraining(day),
+                  onPressed: () => widget.onChooseTraining(widget.day),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            ...slots.map((slot) {
-              return Column(
-                children: [
-                  Row(
-                    children: [
-                      // Время и категория
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+            ...widget.slots.map((slot) {
+              return Dismissible(
+                key: ValueKey(slot),
+                direction: _isEditMode ? DismissDirection.endToStart : DismissDirection.none,
+                onDismissed: (direction) {
+                  _removeTraining(slot);
+                },
+                background: Container(
+                  color: Colors.red,
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        // Время и категория
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                slot.begintime.toUpperCase(),
+                                style: const TextStyle(
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.w300,
+                                ),
+                              ),
+                              FutureBuilder<String>(
+                                future: WorkoutService().getCategoryTitle(slot.category),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return const Text('Загрузка...');
+                                  } else if (snapshot.hasError) {
+                                    return const Text('Ошибка');
+                                  } else {
+                                    return Text(
+                                      '${snapshot.data}',
+                                      style: const TextStyle(fontSize: 16),
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Время + калории + статус
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              slot.begintime.toUpperCase(),
+                              '${slot.workout.duration} мин',
                               style: const TextStyle(
-                                fontSize: 40,
-                                fontWeight: FontWeight.w300,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            FutureBuilder<String>(
-                              future: WorkoutService().getCategoryTitle(slot.category),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return const Text('Загрузка...');
-                                } else if (snapshot.hasError) {
-                                  return const Text('Ошибка');
-                                } else {
-                                  return Text(
-                                    '${snapshot.data}',
-                                    style: const TextStyle(fontSize: 16),
-                                  );
-                                }
-                              },
+                            Text(
+                              '${slot.workout.calories} Ккал',
+                              style: const TextStyle(fontSize: 16),
                             ),
-                          ],
-                        ),
-                      ),
-                      // Время + калории + статус
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            '${slot.workout.duration} мин',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            '${slot.workout.calories} Ккал',
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 8),
-                          slot.isCompleted
-                              ? ElevatedButton(
-                                  onPressed: (){
+                            const SizedBox(height: 8),
+                            slot.isCompleted
+                                ? ElevatedButton(
+                                    onPressed: () {
                                       ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Вы большой молодец!')),
+                                        const SnackBar(
+                                            content: Text('Вы большой молодец!')),
                                       );
                                     },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color.fromARGB(255, 192, 255, 200),
-                                    side: const BorderSide( // Добавляем обводку
-                                      color: Color(0x00000021), // Цвет обводки
-                                      width: 2, // Толщина обводки
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          const Color.fromARGB(255, 192, 255, 200),
+                                      side: const BorderSide(
+                                        color: Color(0x00000021),
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'выполнено',
+                                      style: TextStyle(color: Colors.black),
+                                    ),
+                                  )
+                                : ElevatedButton(
+                                    onPressed: () => widget.onSelectSlot(slot),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xEFEFEFFF),
+                                      side: const BorderSide(
+                                        color: Color(0x00000021),
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'начать',
+                                      style: TextStyle(color: Colors.grey),
                                     ),
                                   ),
-                                  child: const Text('выполнено', style: TextStyle(color: Colors.black),),
-                                )
-                              : ElevatedButton(
-                                  onPressed: () => onSelectSlot(slot),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xEFEFEFFF),
-                                    side: const BorderSide( // Добавляем обводку
-                                      color: Color(0x00000021), // Цвет обводки
-                                      width: 2, // Толщина обводки
-                                    ),
-                                  ),
-                                  child: const Text('начать', style: TextStyle(color: Colors.grey),),
-                                ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const Divider(height: 32),
-                ],
+                          ],
+                        ),
+                      ],
+                    ),
+                    const Divider(height: 32),
+                  ],
+                ),
               );
             }).toList(),
-            if (slots.isEmpty)
+            if (widget.slots.isEmpty)
               const Center(
                 child: Text(
                   'Пока что тренировок нет...',
