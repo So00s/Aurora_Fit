@@ -187,10 +187,31 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     ),
                     child: GradientButton(
                       text: "Начать заново",
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Начать заново')),
-                        );
+                      onPressed: () async {
+                        if (_fitnessData != null) {
+                          setState(() {
+                            // Очищаем и перезаписываем содержимое schedule
+                            _fitnessData!.schedule.clear();
+                            _fitnessData!.schedule.addAll({
+                              "Понедельник": [],
+                              "Вторник": [],
+                              "Среда": [],
+                              "Четверг": [],
+                              "Пятница": [],
+                              "Суббота": [],
+                              "Воскресенье": [],
+                            });
+                          });
+                          await _saveData();
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Расписание очищено!')),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Ошибка: данные отсутствуют')),
+                          );
+                        }
                       },
                     ),
                   ),
