@@ -1,3 +1,5 @@
+import 'training.dart';
+
 class ExerciseCategory {
   final String title; // Название категории упражнений
   final Map<String, Training> trainings; // Карта тренировок, где ключ - название тренировки, а значение - объект Training

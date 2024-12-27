@@ -1,12 +1,10 @@
-import 'dart:convert';
+
+import 'package:aurora_fit/services/types_of_trainings_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import "package:aurora_fit/services/fitness_data_service.dart";
 import 'package:aurora_fit/models/exercise.dart' as ex;
 import 'package:aurora_fit/models/training.dart';
-import 'package:aurora_fit/models/fitness_data.dart';
 import 'package:aurora_fit/models/types_of_trainings.dart';
-import 'package:aurora_fit/services/types_of_training_service.dart';
+
 
 class DescriptionOfTraining extends StatefulWidget {
   final String trainingType; // Тип тренировки (например, "cardio")
@@ -30,7 +28,7 @@ class _DescriptionOfTrainingState extends State<DescriptionOfTraining> {
   @override
   void initState() {
     super.initState();
-    _fitnessDataFuture = TypesOfDataService().loadFitnessData();
+    _fitnessDataFuture = TypesOfTrainingsService().loadTrainings();
     }
 
   @override
