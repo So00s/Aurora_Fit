@@ -1,9 +1,7 @@
-// lib/pages/start_training_page.dart
-
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:aurora_fit/models/exercise.dart';
 import 'package:aurora_fit/models/training.dart';
-import 'dart:async';
 
 class StartTrainingPage extends StatefulWidget {
   final Training training;
@@ -103,8 +101,8 @@ class _StartTrainingPageState extends State<StartTrainingPage> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context, true); // Возвращаемся к расписанию с отметкой
+              Navigator.pop(context); // Закрываем диалог
+              Navigator.pop(context, true); // Передаем результат завершения
             },
             child: const Text('Закрыть'),
           ),
@@ -118,7 +116,7 @@ class _StartTrainingPageState extends State<StartTrainingPage> {
     setState(() {
       _currentExerciseIndex++;
     });
-    if (_currentExerciseIndex < widget.training.exercises.length - 1) {
+    if (_currentExerciseIndex < widget.training.exercises.length) {
       _startExercise(widget.training.exercises[_currentExerciseIndex]);
     } else {
       _showCompletionDialog();
@@ -142,12 +140,71 @@ class _StartTrainingPageState extends State<StartTrainingPage> {
 
   @override
   Widget build(BuildContext context) {
-    Exercise currentExercise =
-        widget.training.exercises[_currentExerciseIndex];
+    Exercise currentExercise = widget.training.exercises[_currentExerciseIndex];
     return Scaffold(
       appBar: AppBar(
-        title: Text(currentExercise.name),
-        backgroundColor: const Color.fromARGB(255, 239, 85, 8),
+        backgroundColor: const Color.fromARGB(255, 248, 248, 248),
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        flexibleSpace: Padding(
+          padding: const EdgeInsets.only(top: 30),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back, color: Color.fromARGB(255, 239, 85, 8)),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'AURORA',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromARGB(255, 239, 85, 8),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        const Text(
+                          'FIT',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromARGB(255, 100, 4, 185),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Image.asset(
+                          'assets/images/full.png',
+                          height: 30,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      currentExercise.name,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 100, 4, 185),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -163,11 +220,23 @@ class _StartTrainingPageState extends State<StartTrainingPage> {
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
+            // Круглый таймер с прогрессом (увеличим размер)
+            SizedBox(
+              width: 200, // Увеличим размер
+              height: 200, // Увеличим размер
+              child: CircularProgressIndicator(
+                value: _remainingSeconds / _parseTime(currentExercise.time),
+                strokeWidth: 12.0, // Сделаем стрелку толще
+                valueColor: AlwaysStoppedAnimation<Color>(const Color.fromARGB(255, 239, 85, 8)),
+              ),
+            ),
+            const SizedBox(height: 20),
             Text(
               _formatTime(_remainingSeconds),
               style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
             ),
             const Spacer(),
+            // Кнопки
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -178,10 +247,15 @@ class _StartTrainingPageState extends State<StartTrainingPage> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 15),
+                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
                   ),
-                  child: const Text('Стоп'),
+                  child: const Text(
+                    'Стоп',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -193,11 +267,16 @@ class _StartTrainingPageState extends State<StartTrainingPage> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 15),
+                    backgroundColor: Color.fromARGB(255, 87, 243, 108),
+                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
                   ),
-                  child: Text(_isRest ? 'Далее' : 'Перерыв'),
+                  child: Text(
+                    _isRest ? 'Далее' : 'Перерыв',
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                  ),
                 ),
               ],
             ),

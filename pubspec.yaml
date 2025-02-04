@@ -76,8 +76,8 @@ flutter:
   assets:
     - assets/images/full.png
     - assets/images/
-    - lib/json/types_of_trainings.json
-    - lib/json/fitness_data.json
+    - lib/json/all_workouts.json
+    - lib/json/selected_workouts.json
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

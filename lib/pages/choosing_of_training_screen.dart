@@ -1,21 +1,26 @@
 //lib/pages/choosing_of_training_screen.dart
 
-import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import "package:aurora_fit/services/fitness_data_service.dart";
-import 'package:aurora_fit/models/exercise.dart' as ex;
 import 'package:aurora_fit/models/training.dart';
 import 'package:aurora_fit/models/fitness_data.dart';
 import 'package:aurora_fit/models/types_of_trainings.dart';
 import 'package:aurora_fit/pages/training_description_screen.dart';
-import 'package:aurora_fit/services/types_of_training_service.dart';
+import 'package:aurora_fit/services/types_of_trainings_service.dart';
+import 'package:aurora_fit/pages/schedule_screen.dart';
+
+
 
 class ChoosingOfTrainingScreen extends StatefulWidget {
   final String trainingType; // Тип тренировки (например, "cardio")
+  final String dayOfWeek;
 
-  const ChoosingOfTrainingScreen({Key? key, required this.trainingType})
-      : super(key: key);
+  const ChoosingOfTrainingScreen({
+    Key? key, 
+    required this.trainingType,
+    required this.dayOfWeek,
+    }) : super(key: key);
 
   @override
   _TrainingListScreenState createState() => _TrainingListScreenState();
@@ -30,7 +35,7 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
   @override
   void initState() {
     super.initState();
-    _trainingDataFuture = TypesOfDataService().loadFitnessData();
+    _trainingDataFuture = TypesOfTrainingsService().loadTrainings();
     _fitnessDataFuture = FitnessDataService().loadFitnessData();
   }
 
@@ -129,7 +134,7 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              '${_calculateDuration(training)} минут',
+              _calculateDuration(training),
               style: const TextStyle(
                 fontSize: 14,
                 color: Colors.black54,
@@ -154,18 +159,21 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
                   child: const Text(
                     'подробнее',
                     style: TextStyle(
-                      color: Color.fromARGB(255, 100, 4, 185),
+                      color: Colors.black,
                     ),
                   ),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    _showTrainingDetailsDialog(widget.trainingType, _getTrainingTypeTitle(), training);
+                    _showTimePickerDialog(widget.trainingType, training);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 239, 85, 8),
                   ),
-                  child: const Text('выбрать'),
+                  child: const Text(
+                    'выбрать',
+                    style: TextStyle(color: Colors.white),
+                    ),
                 ),
               ],
             ),
@@ -175,42 +183,47 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
     );
   }
 
-  int _calculateDuration(Training training) {
-    return training.exercises.length; // Пример: количество упражнений = минуты
-  }
+  String _calculateDuration(Training training) {
+  final totalSeconds = training.exercises.fold<int>(0, (totalDuration, exercise) {
+    // Парсим время упражнения в минуты и секунды
+    final parts = exercise.time.split(':');
+    final minutes = int.tryParse(parts[0]) ?? 0;
+    final seconds = int.tryParse(parts.length > 1 ? parts[1] : '0') ?? 0;
 
-  int _calculateCalories(Training training) {
-    return training.exercises.fold(
-        0, (sum, exercise) => sum + (exercise.calories ?? 0));
-  }
+    // Считаем общее время в секундах
+    return totalDuration + (minutes * 60 + seconds);
+  });
 
-  void _showTrainingDetailsDialog(String trainingType, String trainingTitle, Training training) {
-  final Map<String, dynamic> trainingData = {
-    trainingType: {
-      'title': trainingTitle,
-      training.name: {
-        'name': training.name,
-        'exercises': training.exercises.map((exercise) {
-          return {
-            'name': exercise.name,
-            'description': exercise.description,
-            'time': exercise.time,
-            'calories': exercise.calories
-          };
-        }).toList(),
-      },
-    },
-  };
+  // Преобразуем общее время обратно в формат MM:SS
+  final minutes = totalSeconds ~/ 60;
+  final seconds = totalSeconds % 60;
+  return '$minutes:${seconds.toString().padLeft(2, '0')}';
+}
 
-  final String jsonData = const JsonEncoder.withIndent('  ').convert(trainingData);
-
+  void _showTrainingDetailsDialog(Training training) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('Данные тренировки'),
+        title: Text(training.name),
         content: SingleChildScrollView(
-          child: Text(jsonData),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Калории: ${_calculateCalories(training)} Ккал'),
+              const SizedBox(height: 8),
+              Text('Длительность: ${_calculateDuration(training)} минут'),
+              const SizedBox(height: 8),
+              Text('Упражнения:'),
+              const SizedBox(height: 8),
+              ...training.exercises.map((exercise) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 4.0),
+                  child: Text('- ${exercise.name}'),
+                );
+              }).toList(),
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -223,7 +236,61 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
       );
     },
   );
-} 
+}
+
+
+  int _calculateCalories(Training training) {
+    return training.exercises.fold(
+        0, (sum, exercise) => sum + (exercise.calories ?? 0));
+  }
+
+  Future<void> _addTrainingToSchedule(String begintime, String category, Training training) async {
+    try {
+      // Загрузка текущих данных
+      final fitnessData = await FitnessDataService().loadFitnessData();
+
+      // Создаем объект WorkoutSummary
+      final workout = WorkoutSummary(
+        name: training.name,
+        calories: _calculateCalories(training),
+        duration: _calculateDuration(training),
+      );
+
+      // Создаем новый слот тренировки
+      final newSlot = TrainingSlot(
+        begintime: begintime,
+        category: category,
+        isCompleted: false,
+        workout: workout,
+      );
+
+      // Добавляем тренировку в расписание
+      fitnessData.schedule[widget.dayOfWeek]?.add(newSlot);
+
+      // Сохраняем обновленные данные
+      await FitnessDataService().saveFitnessData(fitnessData);
+
+      //Переход на главный экран и обновление
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const ScheduleScreen()),
+        (route) => false,
+      );
+      
+      // Navigator.push(
+      //               context,
+      //               MaterialPageRoute(builder: (context) => const ScheduleScreen()),
+      //             );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Тренировка успешно добавлена!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка при сохранении: $e')),
+      );
+    }
+  }
 
 }
 
@@ -305,5 +372,5 @@ class _TrainingAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(120); // Размер AppBar
+  Size get preferredSize => const Size.fromHeight(80); // Размер AppBar
 }

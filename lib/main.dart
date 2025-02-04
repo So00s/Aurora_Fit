@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:aurora_fit/pages/aurora_first_page.dart';
-import 'package:path_provider/path_provider.dart';
 import 'services/notification_service.dart';
-import 'package:aurora_fit/pages/aurora_first_page.dart';
 
 void main() async{
   await notification_service.init();
