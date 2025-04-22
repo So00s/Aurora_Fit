@@ -137,7 +137,7 @@ class _AuroraFirstPageState extends State<AuroraFirstPage> {
                   // Переход на ScheduleScreen
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ChoosingTypeOfTrainingScreen()),
+                    MaterialPageRoute(builder: (context) => const ScheduleScreen()),
                   );
                 },
               ),

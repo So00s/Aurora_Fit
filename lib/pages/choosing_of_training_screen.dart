@@ -200,43 +200,81 @@ class _TrainingListScreenState extends State<ChoosingOfTrainingScreen> {
   return '$minutes:${seconds.toString().padLeft(2, '0')}';
 }
 
-  void _showTrainingDetailsDialog(Training training) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text(training.name),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Калории: ${_calculateCalories(training)} Ккал'),
-              const SizedBox(height: 8),
-              Text('Длительность: ${_calculateDuration(training)} минут'),
-              const SizedBox(height: 8),
-              Text('Упражнения:'),
-              const SizedBox(height: 8),
-              ...training.exercises.map((exercise) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 4.0),
-                  child: Text('- ${exercise.name}'),
-                );
-              }).toList(),
-            ],
+  void _showTimePickerDialog(String trainingType, Training training) {
+    int selectedHour = 8; // Время по умолчанию (час)
+    int selectedMinute = 0; // Время по умолчанию (минута)
+
+    final List<int> availableHours = List.generate(24, (index) => index); // Список доступных часов (0-23)
+    final List<int> availableMinutes = List.generate(60, (index) => index); // Список доступных минут (0-59)
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Выберите время'),
+          content: SizedBox(
+            height: 200,
+            child: Row(
+              children: [
+                // Выбор часа
+                Expanded(
+                  child: CupertinoPicker(
+                    scrollController: FixedExtentScrollController(
+                      initialItem: selectedHour,
+                    ),
+                    itemExtent: 32.0,
+                    onSelectedItemChanged: (int index) {
+                      selectedHour = availableHours[index];
+                    },
+                    children: availableHours.map((hour) => Text(hour.toString().padLeft(2, '0'))).toList(),
+                  ),
+                ),
+                // Выбор минуты
+                Expanded(
+                  child: CupertinoPicker(
+                    scrollController: FixedExtentScrollController(
+                      initialItem: selectedMinute,
+                    ),
+                    itemExtent: 32.0,
+                    onSelectedItemChanged: (int index) {
+                      selectedMinute = availableMinutes[index];
+                    },
+                    children: availableMinutes.map((minute) => Text(minute.toString().padLeft(2, '0'))).toList(),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Закрыть'),
-          ),
-        ],
-      );
-    },
-  );
-}
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Закрытие диалога
+              },
+              child: const Text('Отмена'),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Формируем строку времени, проверяя корректность значений
+                String selectedTime = "${selectedHour.toString().padLeft(2, '0')}:${selectedMinute.toString().padLeft(2, '0')}";
+                
+                // Убедимся, что значения времени корректны
+                if (selectedHour < 0 || selectedHour > 23 || selectedMinute < 0 || selectedMinute > 59) {
+                  print("Ошибка: некорректное время");
+                  // Navigator.of(context).pop(); // Закрываем диалог
+                  return;
+                }
+
+                // Добавляем тренировку в расписание
+                await _addTrainingToSchedule(selectedTime, trainingType, training);
+                // Navigator.of(context).pop(); // Закрываем диалог
+              },
+              child: const Text('Сохранить'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
 
   int _calculateCalories(Training training) {
